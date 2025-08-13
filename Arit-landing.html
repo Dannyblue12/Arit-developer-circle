@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arit Developer Circle</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Updated to use Figtree font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  /* Updated font family to Figtree */
+  font-family: "Figtree", sans-serif;
+  background: white;
+  overflow-x: hidden;
+}
+
+.hero-container {
+  min-height: 100vh;
+  background: white;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Updated background gradients to be more precise and match reference image */
+/* Soft yellow gradient starting from top-left area, aligned with video top edge */
+.hero-container::before {
+  content: "";
+  position: absolute;
+  top: 45%;
+  left: 0;
+  width: 35%;
+  height: 120%;
+  background: radial-gradient(
+    ellipse 80% 100% at 0% 30%,
+    rgba(255, 235, 59, 0.08) 0%,
+    rgba(255, 235, 59, 0.04) 40%,
+    rgba(255, 235, 59, 0.02) 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Soft purple gradient starting from top-right corner down to video bottom */
+.hero-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  background: radial-gradient(
+    ellipse 100% 120% at 100% 0%,
+    rgba(147, 51, 234, 0.06) 0%,
+    rgba(147, 51, 234, 0.03) 40%,
+    rgba(147, 51, 234, 0.015) 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Header Styles */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px;
+  position: relative;
+  z-index: 10;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.logo-icon {
+  width: 48px;
+  height: 48px;
+  background: #000;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.logo-a {
+  color: white;
+}
+
+.logo-d {
+  color: #ff3f7f;
+}
+
+.desktop-nav {
+  display: flex;
+  gap: 32px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #374151;
+  font-weight: 500;
+  font-size: 16px;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #ff3f7f;
+}
+
+/* Updated button gradient to be more subtle - pink to slightly darker pink */
+.join-btn {
+  background: linear-gradient(180deg, #ff3f7f 0%, #e63570 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(255, 63, 127, 0.2);
+}
+
+.join-btn:hover {
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(255, 63, 127, 0.3);
+}
+
+/* Mobile Hamburger Menu */
+.hamburger-btn {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 30;
+}
+
+.hamburger-line {
+  width: 24px;
+  height: 2px;
+  background: #000;
+  transition: all 0.3s ease;
+}
+
+/* Enhanced mobile menu styling with brand colors */
+.mobile-menu {
+  position: fixed;
+  top: 88px;
+  left: 0;
+  right: 0;
+  background: white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-top: 1px solid #f3f4f6;
+  border-radius: 0 0 16px 16px;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  max-height: 0;
+  overflow: hidden;
+}
+
+.mobile-menu.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  max-height: 400px;
+}
+
+.mobile-nav {
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mobile-nav-link {
+  text-decoration: none;
+  color: #374151;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 12px 0;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.mobile-nav-link:hover {
+  color: #ff3f7f;
+  padding-left: 8px;
+}
+
+.mobile-cta {
+  margin-top: 16px;
+  width: 100%;
+}
+
+/* Hero Content */
+.hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 32px 64px;
+  text-align: center;
+  position: relative;
+  z-index: 5;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.hero-text {
+  margin-bottom: 64px;
+}
+
+/* Adjusted font sizes to be more moderate as requested */
+.hero-title {
+  font-size: clamp(48px, 7vw, 100px);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 32px;
+}
+
+.arit-text {
+  color: #ff3f7f;
+}
+
+.developer-text,
+.circle-text {
+  color: #000;
+}
+
+.hero-subtitle {
+  font-size: clamp(16px, 2.5vw, 20px);
+  color: #374151;
+  line-height: 1.6;
+  margin-bottom: 48px;
+  font-weight: 400;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-join-btn {
+  font-size: 18px;
+  padding: 16px 32px;
+  margin-bottom: 64px;
+}
+
+.video-container {
+  width: calc(100% - 16px);
+  max-width: 1200px;
+  margin: 0 auto;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.hero-video {
+  width: 100%;
+  height: auto;
+  min-height: 450px;
+  object-fit: cover;
+  display: block;
+  border: none;
+  outline: none;
+}
+
+/* What you loose by not joining the circle */
+.loose-section {
+  padding: 120px 32px 80px;
+  background: white;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.loose-title {
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 700;
+  text-align: center;
+  color: #000;
+  margin-bottom: 80px;
+  line-height: 1.2;
+}
+
+.loose-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.loose-list {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.loose-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.loose-item-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 8px;
+}
+
+.loose-item-subtitle {
+  font-size: 16px;
+  color: #6b7280;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.loose-video-container {
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.loose-video {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .desktop-nav,
+  .desktop-cta {
+    display: none;
+  }
+
+  .hamburger-btn {
+    display: flex;
+  }
+
+  .header {
+    padding: 16px 24px;
+  }
+
+  .hero-content {
+    padding: 24px 24px 48px;
+  }
+
+  .hero-text {
+    margin-bottom: 48px;
+  }
+
+  .hero-subtitle {
+    margin-bottom: 32px;
+  }
+
+  .hero-join-btn {
+    margin-bottom: 48px;
+    font-size: 16px;
+    padding: 14px 28px;
+  }
+
+  .video-container {
+    width: calc(100% - 8px);
+    margin: 0 auto;
+  }
+
+  .hero-video {
+    min-height: 280px;
+    border: none;
+  }
+
+  /* Improved mobile responsiveness for the second section */
+  .loose-section {
+    padding: 80px 24px 60px;
+  }
+
+  .loose-title {
+    margin-bottom: 60px;
+    font-size: clamp(28px, 6vw, 40px);
+  }
+
+  .loose-content {
+    grid-template-columns: 1fr;
+    gap: 60px;
+  }
+
+  .loose-list {
+    gap: 40px;
+    order: 2;
+  }
+
+  .loose-video-container {
+    order: 1;
+  }
+
+  .loose-item-title {
+    font-size: 20px;
+  }
+
+  .loose-item-subtitle {
+    font-size: 15px;
+  }
+
+  /* Mobile title layout helpers */
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: inline;
+  }
+
+  .mobile-break {
+    display: block;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 16px 20px;
+  }
+
+  .hero-content {
+    padding: 20px 2px 40px;
+  }
+
+  .hero-subtitle {
+    font-size: 16px;
+  }
+
+  .join-btn {
+    font-size: 14px;
+    padding: 12px 24px;
+  }
+
+  .video-container {
+    margin: 0px 0px;
+    padding: 0px;
+  }
+
+  .loose-section {
+    padding: 40px 20px;
+  }
+
+  .loose-title {
+    margin-top: 80px;
+    margin-bottom: 20px;
+  }
+
+  .loose-content {
+    gap: 40px;
+  }
+
+  .loose-list {
+    gap: 32px;
+  }
+
+  .mobile-nav {
+    padding: 20px 24px;
+  }
+}
+
+/* Desktop specific styles */
+@media (min-width: 769px) {
+  .mobile-menu {
+    display: none !important;
+  }
+
+  .desktop-only {
+    display: inline;
+  }
+
+  .mobile-only {
+    display: none;
+  }
+
+  .mobile-break {
+    display: none;
+  }
+}
+
+    </style>
+</head>
+<body>
+    <div class="hero-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <span class="logo-a">A</span><span class="logo-d">D</span>
+                </div>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <nav class="navigation desktop-nav">
+                <a href="#" class="nav-link">Shop</a>
+                <a href="#" class="nav-link">Private coaching</a>
+                <a href="#" class="nav-link">Private mentorship</a>
+                <a href="#" class="nav-link">Resources</a>
+            </nav>
+            
+            <!-- Desktop CTA Button -->
+            <button class="join-btn desktop-cta">Join the community</button>
+            
+            <!-- Mobile Hamburger Menu -->
+            <button class="hamburger-btn" id="hamburgerBtn">
+                <div class="hamburger-line"></div>
+                <div class="hamburger-line"></div>
+                <div class="hamburger-line"></div>
+            </button>
+        </header>
+
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <nav class="mobile-nav">
+                <a href="#" class="mobile-nav-link">Shop</a>
+                <a href="#" class="mobile-nav-link">Private coaching</a>
+                <a href="#" class="mobile-nav-link">Private mentorship</a>
+                <a href="#" class="mobile-nav-link">Resources</a>
+                <button class="join-btn mobile-cta">Join the community</button>
+            </nav>
+        </div>
+
+        <!-- Hero Content -->
+        <main class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    <!-- Fixed title layout - "Arit Developer" on one line, "Circle" on next line for both desktop and mobile -->
+                    <span class="arit-text">Arit</span> 
+                    <span class="developer-text">Developer</span>
+                    <br>
+                    <span class="circle-text">Circle</span>
+                </h1>
+                
+                <p class="hero-subtitle">
+                    The community of that takes you<br>
+                    from learning to earning 💸
+                </p>
+                
+                <button class="join-btn hero-join-btn">Join the community</button>
+            </div>
+            
+            <div class="video-container">
+                <!-- Updated video source to use the correct uploaded video -->
+                <video class="hero-video" autoplay muted loop playsinline preload="auto">
+                    <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/VID-20250812-WA0026-bUtNEMi2KmSNTV9k1RNG3s7E7rtWRq.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Added spacing before the section -->
+    <section class="loose-section">
+        <h2 class="loose-title">
+            What you loose by not<br>
+            joining the circle
+        </h2>
+        
+        <div class="loose-content">
+            <div class="loose-list">
+                <div class="loose-item">
+                    <h3 class="loose-item-title">Newbie Support</h3>
+                    <p class="loose-item-subtitle">We support early-career software developers and tech professionals.</p>
+                </div>
+                
+                <div class="loose-item">
+                    <h3 class="loose-item-title">Regular Mentorships</h3>
+                </div>
+                
+                <div class="loose-item">
+                    <h3 class="loose-item-title">Cohort Programs</h3>
+                </div>
+            </div>
+            
+            <div class="loose-video-container">
+                <!-- Updated video source to use the correct uploaded video -->
+                <video class="loose-video" autoplay muted loop playsinline preload="auto">
+                    <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/VID-20250812-WA0024-OG4NrT6SqprjoMrqHVzOH9ACXZSvf1.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+    </section>
+    
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+  const hamburgerBtn = document.getElementById("hamburgerBtn")
+  const mobileMenu = document.getElementById("mobileMenu")
+
+  console.log("Hamburger button:", hamburgerBtn)
+  console.log("Mobile menu:", mobileMenu)
+
+  if (hamburgerBtn && mobileMenu) {
+    hamburgerBtn.addEventListener("click", (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+
+      console.log("Hamburger clicked")
+
+      // Toggle active class
+      const isActive = mobileMenu.classList.contains("active")
+
+      if (isActive) {
+        mobileMenu.classList.remove("active")
+      } else {
+        mobileMenu.classList.add("active")
+      }
+
+      console.log("Menu active:", mobileMenu.classList.contains("active"))
+
+      // Animate hamburger lines
+      const lines = hamburgerBtn.querySelectorAll(".hamburger-line")
+      if (mobileMenu.classList.contains("active")) {
+        lines[0].style.transform = "rotate(45deg) translate(5px, 5px)"
+        lines[1].style.opacity = "0"
+        lines[2].style.transform = "rotate(-45deg) translate(7px, -6px)"
+      } else {
+        lines[0].style.transform = "none"
+        lines[1].style.opacity = "1"
+        lines[2].style.transform = "none"
+      }
+    })
+
+    // Close mobile menu when clicking outside
+    document.addEventListener("click", (event) => {
+      if (!hamburgerBtn.contains(event.target) && !mobileMenu.contains(event.target)) {
+        mobileMenu.classList.remove("active")
+
+        // Reset hamburger lines
+        const lines = hamburgerBtn.querySelectorAll(".hamburger-line")
+        lines[0].style.transform = "none"
+        lines[1].style.opacity = "1"
+        lines[2].style.transform = "none"
+      }
+    })
+
+    // Close mobile menu when window is resized to desktop
+    window.addEventListener("resize", () => {
+      if (window.innerWidth >= 769) {
+        mobileMenu.classList.remove("active")
+
+        // Reset hamburger lines
+        const lines = hamburgerBtn.querySelectorAll(".hamburger-line")
+        lines[0].style.transform = "none"
+        lines[1].style.opacity = "1"
+        lines[2].style.transform = "none"
+      }
+    })
+
+    // Close mobile menu when clicking on nav links
+    const mobileNavLinks = mobileMenu.querySelectorAll(".mobile-nav-link")
+    mobileNavLinks.forEach((link) => {
+      link.addEventListener("click", () => {
+        mobileMenu.classList.remove("active")
+
+        // Reset hamburger lines
+        const lines = hamburgerBtn.querySelectorAll(".hamburger-line")
+        lines[0].style.transform = "none"
+        lines[1].style.opacity = "1"
+        lines[2].style.transform = "none"
+      })
+    })
+  } else {
+    console.error("Mobile menu elements not found")
+  }
+
+  // Enhanced video loading
+  const videos = document.querySelectorAll("video")
+  videos.forEach((video) => {
+    video.addEventListener("loadstart", () => {
+      console.log("Video loading started")
+    })
+
+    video.addEventListener("canplay", () => {
+      console.log("Video can start playing")
+      video.play().catch((e) => console.log("Video autoplay failed:", e))
+    })
+
+    video.addEventListener("error", (e) => {
+      console.error("Video error:", e)
+    })
+  })
+})
+
+    </script>
+</body>
+</html>
