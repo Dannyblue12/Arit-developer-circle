@@ -42,12 +42,9 @@ export default function App() {
   }, []);
 
   if (!onboarded) {
-    return (
-      <>
-        <StatusBar style="light" />
-        <Onboarding onDone={() => setOnboarded(true)} />
-      </>
-    );
+    // Onboarding sets its own status bar style (light on the dark welcome
+    // screen, dark on the paper slides).
+    return <Onboarding onDone={() => setOnboarded(true)} />;
   }
 
   if (!sessionReady) {

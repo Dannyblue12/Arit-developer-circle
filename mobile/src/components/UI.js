@@ -1,11 +1,15 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { C, naira } from "../theme/theme";
+
+// Shared press feedback: everything tappable settles to 0.98 scale.
+export const pressScale = ({ pressed }) =>
+  pressed ? { transform: [{ scale: 0.98 }], opacity: 0.92 } : null;
 
 export function Card({ children, style, onPress }) {
   const body = <View style={[st.card, style]}>{children}</View>;
   return onPress ? (
-    <TouchableOpacity activeOpacity={0.85} onPress={onPress}>{body}</TouchableOpacity>
+    <Pressable onPress={onPress} style={pressScale}>{body}</Pressable>
   ) : body;
 }
 
@@ -23,13 +27,18 @@ export function SectionLabel({ children, right, live }) {
 
 export function Cta({ label, onPress, ghost, danger, style }) {
   return (
-    <TouchableOpacity
-      activeOpacity={0.85}
+    <Pressable
       onPress={onPress}
-      style={[st.cta, ghost && st.ctaGhost, danger && { backgroundColor: C.live }, style]}
+      style={({ pressed }) => [
+        st.cta,
+        ghost && st.ctaGhost,
+        danger && { backgroundColor: C.live },
+        style,
+        pressed && { transform: [{ scale: 0.98 }], opacity: 0.92 },
+      ]}
     >
       <Text style={[st.ctaText, ghost && { color: C.royal }]}>{label}</Text>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 

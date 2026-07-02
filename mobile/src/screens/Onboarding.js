@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { C } from "../theme/theme";
 import { Cta } from "../components/UI";
 import { linkOpay } from "../api/client";
@@ -25,17 +26,63 @@ const SLIDES = [
   },
 ];
 
+function Dots({ step }) {
+  // One value drives every dot: each interpolates its own width/colour from
+  // how far the active step is from it, so the active dot widens smoothly.
+  const anim = useRef(new Animated.Value(step)).current;
+  useEffect(() => {
+    Animated.timing(anim, { toValue: step, duration: 250, useNativeDriver: false }).start();
+  }, [step, anim]);
+  return (
+    <View style={st.dots}>
+      {SLIDES.map((_, i) => (
+        <Animated.View
+          key={i}
+          style={[
+            st.dot,
+            {
+              width: anim.interpolate({
+                inputRange: [i - 1, i, i + 1],
+                outputRange: [7, 22, 7],
+                extrapolate: "clamp",
+              }),
+              backgroundColor: anim.interpolate({
+                inputRange: [i - 0.5, i, i + 0.5],
+                outputRange: [C.mint2, C.royal, C.mint2],
+                extrapolate: "clamp",
+              }),
+            },
+          ]}
+        />
+      ))}
+    </View>
+  );
+}
+
 export default function Onboarding({ onDone }) {
   const [step, setStep] = useState(-1); // -1 = welcome, 0..2 = slides, 3 = connect
+  const anim = useRef(new Animated.Value(1)).current;
+
+  // Each step change: content starts 24px right + transparent, settles in 250ms.
+  useEffect(() => {
+    anim.setValue(0);
+    Animated.timing(anim, { toValue: 1, duration: 250, useNativeDriver: true }).start();
+  }, [step, anim]);
+
+  const slideIn = {
+    opacity: anim,
+    transform: [{ translateX: anim.interpolate({ inputRange: [0, 1], outputRange: [24, 0] }) }],
+  };
 
   if (step === -1) {
     return (
       <View style={[st.wrap, { backgroundColor: C.royalDeep }]}>
-        <View style={st.center}>
+        <StatusBar style="light" />
+        <Animated.View style={[st.center, { opacity: anim }]}>
           <View style={st.logo}><Text style={{ fontSize: 42 }}>📍</Text></View>
           <Text style={st.brand}>Savi</Text>
           <Text style={st.tag}>Spend like you <Text style={{ fontStyle: "italic", color: C.goldSoft }}>sabi</Text>.</Text>
-        </View>
+        </Animated.View>
         <View style={{ padding: 24 }}>
           <Cta label="Get started" onPress={() => setStep(0)} />
           <Cta label="I already have an account" ghost onPress={onDone} />
@@ -47,7 +94,8 @@ export default function Onboarding({ onDone }) {
   if (step === 3) {
     return (
       <View style={st.wrap}>
-        <View style={[st.center, { paddingHorizontal: 28 }]}>
+        <StatusBar style="dark" />
+        <Animated.View style={[st.center, { paddingHorizontal: 28 }, slideIn]}>
           <Text style={st.h}>Two quick permissions</Text>
           <Text style={st.p}>You're in control — change either any time in settings.</Text>
           <View style={st.perm}>
@@ -64,7 +112,7 @@ export default function Onboarding({ onDone }) {
               <Text style={st.permS}>So we can show prices near you and pin your finds to the right market.</Text>
             </View>
           </View>
-        </View>
+        </Animated.View>
         <View style={{ padding: 24 }}>
           <Cta label="Allow & enter Savi" onPress={async () => { await linkOpay(); onDone(); }} />
           <Cta label="Maybe later" ghost onPress={onDone} />
@@ -76,21 +124,18 @@ export default function Onboarding({ onDone }) {
   const s = SLIDES[step];
   return (
     <View style={st.wrap}>
-      <TouchableOpacity style={st.skip} onPress={onDone}>
+      <StatusBar style="dark" />
+      <TouchableOpacity style={st.skip} onPress={onDone} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
         <Text style={{ color: C.muted, fontWeight: "600" }}>Skip</Text>
       </TouchableOpacity>
-      <View style={[st.center, { paddingHorizontal: 32 }]}>
+      <Animated.View style={[st.center, { paddingHorizontal: 32 }, slideIn]}>
         <View style={st.art}><Text style={{ fontSize: 64 }}>{s.emoji}</Text></View>
         <Text style={st.eyebrow}>{s.eyebrow}</Text>
         <Text style={st.h}>{s.title}</Text>
         <Text style={st.p}>{s.body}</Text>
-      </View>
+      </Animated.View>
       <View style={{ padding: 24 }}>
-        <View style={st.dots}>
-          {SLIDES.map((_, i) => (
-            <View key={i} style={[st.dot, i === step && st.dotOn]} />
-          ))}
-        </View>
+        <Dots step={step} />
         <Cta
           label={step < SLIDES.length - 1 ? "Next" : "Set up my account"}
           onPress={() => setStep(step + 1)}
@@ -118,8 +163,7 @@ const st = StyleSheet.create({
   h: { fontSize: 28, fontWeight: "800", color: C.ink, textAlign: "center" },
   p: { fontSize: 14.5, color: C.muted, textAlign: "center", marginTop: 12, lineHeight: 21 },
   dots: { flexDirection: "row", justifyContent: "center", marginBottom: 18 },
-  dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: C.mint2, marginHorizontal: 3 },
-  dotOn: { width: 22, backgroundColor: C.royal },
+  dot: { height: 7, borderRadius: 4, marginHorizontal: 3 },
   perm: {
     flexDirection: "row", backgroundColor: "#fff", borderWidth: 1,
     borderColor: C.line, borderRadius: 16, padding: 16, marginTop: 12, width: "100%",
