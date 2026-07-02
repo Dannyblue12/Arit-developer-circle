@@ -7,8 +7,10 @@ const { buildSuggestions, benchmarkFor, CATEGORY_META } = require("../services/s
 router.use(requireAuth);
 
 function monthWindow() {
+  // Rolling 30 days, not calendar month: the seeded demo month spans the
+  // last ~20 days, and a calendar window shows almost nothing on the 1st-2nd.
   const start = new Date();
-  start.setDate(1); start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - 30); start.setHours(0, 0, 0, 0);
   return { occurredAt: { $gte: start } };
 }
 
@@ -68,7 +70,7 @@ router.get("/suggestions", async (req, res) => {
 // GET /api/spending/tidy — unknown transactions awaiting a one-tap tag
 router.get("/tidy", async (req, res) => {
   const unknowns = await Transaction.find({
-    user: req.user._id, category: "unknown", ...monthWindow(),
+    user: req.user._id, category: "unknown", direction: "debit", ...monthWindow(),
   }).sort("-occurredAt").limit(10);
   res.json({ unknowns });
 });
@@ -84,7 +86,8 @@ router.post("/tidy/:txId", async (req, res) => {
   tx.categorySource = "user";
   await tx.save();
 
-  req.user.counterpartyTags.set(tx.counterparty, category);
+  req.user.counterpartyTags = { ...req.user.counterpartyTags, [tx.counterparty]: category };
+  req.user.markModified("counterpartyTags");
   await req.user.save();
 
   // retro-apply to that counterparty's other unknowns

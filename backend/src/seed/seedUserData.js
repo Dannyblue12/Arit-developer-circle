@@ -79,7 +79,8 @@ async function seedForUser(user) {
   if (existing > 0) return; // already seeded
 
   // pre-tag the supplier so the memory feature is visible immediately
-  user.counterpartyTags.set("David O.", "stock");
+  user.counterpartyTags = { ...user.counterpartyTags, "David O.": "stock" };
+  user.markModified("counterpartyTags");
   await user.save();
 
   const history = [];

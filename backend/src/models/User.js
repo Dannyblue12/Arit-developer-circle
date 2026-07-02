@@ -16,9 +16,10 @@ const userSchema = new mongoose.Schema(
     // counterparty memory: once the user tags "David O." as supplier,
     // future transfers to David auto-categorise. This is the "ask once,
     // remember forever" behaviour from the product spec.
+    // Stored as a plain object (not a Mongoose Map) because counterparty
+    // names like "David O." contain dots, which Map keys forbid.
     counterpartyTags: {
-      type: Map,
-      of: String, // counterpartyName -> category slug
+      type: mongoose.Schema.Types.Mixed, // counterpartyName -> category slug
       default: {},
     },
   },
