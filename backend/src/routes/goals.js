@@ -6,7 +6,9 @@ router.use(requireAuth);
 
 // GET /api/goals
 router.get("/", async (req, res) => {
-  const goals = await Goal.find({ user: req.user._id }).sort("-createdAt");
+  // Oldest first: the user's first goal is their primary goal (the hero
+  // card on Home/Goals), matching the bundled demo data's ordering.
+  const goals = await Goal.find({ user: req.user._id }).sort("createdAt");
   res.json({ goals });
 });
 

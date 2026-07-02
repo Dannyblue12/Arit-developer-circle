@@ -57,9 +57,19 @@ npm install
 npm start                   # Expo dev server; press a for Android
 ```
 
-**Point the app at your API:** edit `mobile/src/api/client.js` → `BASE_URL`.
-- Android emulator: `http://10.0.2.2:4000` (default)
-- Physical phone: your machine's LAN IP, e.g. `http://192.168.1.50:4000`
+**Point the app at your API:** automatic. The app derives the API host from
+the Expo dev server it loaded from — scan the QR with Expo Go on a phone on
+the **same wifi** as your machine and it reaches `http://<your-LAN-IP>:4000`
+by itself (Android emulator falls back to `http://10.0.2.2:4000`). To point
+somewhere else, set `EXPO_PUBLIC_API_URL`, e.g.:
+
+```bash
+EXPO_PUBLIC_API_URL=http://192.168.1.50:4000 npm start
+```
+
+**Sign-in:** the app signs itself into the seeded demo account on launch
+(and registers it first if the backend is fresh), so live data flows with
+zero setup.
 
 **Offline-safe demo:** if the API is unreachable, the app automatically falls
 back to bundled demo data (identical to the seeded backend) and shows a small
