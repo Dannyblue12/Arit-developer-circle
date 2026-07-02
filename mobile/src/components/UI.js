@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import { View, Text, Pressable, StyleSheet, Animated } from "react-native";
+import { View, Text, Pressable, StyleSheet, Animated, Easing } from "react-native";
 import { C, naira } from "../theme/theme";
 
 // Gentle pulse placeholder shown while a data section loads — never a blank gap.
@@ -83,10 +83,28 @@ export function Cta({ label, onPress, ghost, danger, style }) {
   );
 }
 
+// Fills from 0 to its value on mount (500ms ease-out) — progress should feel
+// like motion toward a finish line, not a static report.
 export function ProgressBar({ value, height = 9, track = C.mint, fill = C.royal }) {
+  const anim = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: Math.min(1, value || 0),
+      duration: 500,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false, // width is a layout prop
+    }).start();
+  }, [value, anim]);
   return (
     <View style={{ height, borderRadius: height / 2, backgroundColor: track, overflow: "hidden" }}>
-      <View style={{ width: `${Math.min(100, Math.round(value * 100))}%`, flex: 1, backgroundColor: fill, borderRadius: height / 2 }} />
+      <Animated.View
+        style={{
+          width: anim.interpolate({ inputRange: [0, 1], outputRange: ["0%", "100%"], extrapolate: "clamp" }),
+          flex: 1,
+          backgroundColor: fill,
+          borderRadius: height / 2,
+        }}
+      />
     </View>
   );
 }
