@@ -23,11 +23,11 @@ export function Skeleton({ height = 16, width = "100%", radius = 10, style }) {
 }
 
 // First-mount entrance: fade in while sliding up 12px. Stagger with `delay`.
-export function Entrance({ delay = 0, children, style }) {
+export function Entrance({ delay = 0, duration = 300, children, style }) {
   const anim = useRef(new Animated.Value(0)).current;
   useEffect(() => {
-    Animated.timing(anim, { toValue: 1, duration: 300, delay, useNativeDriver: true }).start();
-  }, [anim, delay]);
+    Animated.timing(anim, { toValue: 1, duration, delay, useNativeDriver: true }).start();
+  }, [anim, delay, duration]);
   return (
     <Animated.View
       style={[
