@@ -11,11 +11,31 @@ import Goals from "./src/screens/Goals";
 import Watch from "./src/screens/Watch";
 import Prices from "./src/screens/Prices";
 import { C } from "./src/theme/theme";
-import { usingDemo, ensureSession } from "./src/api/client";
+import { usingDemo, ensureSession, watchDanger, getWatch } from "./src/api/client";
 
 const Tab = createBottomTabNavigator();
 
 const ICONS = { Home: "🏠", Spending: "📊", Goals: "🎯", Watch: "🛡️", Prices: "🏷️" };
+
+function TabIcon({ name }) {
+  const danger = useSyncExternalStore(
+    (cb) => watchDanger.subscribe(cb),
+    () => watchDanger.value
+  );
+  return (
+    <View>
+      <Text style={{ fontSize: 18 }}>{ICONS[name]}</Text>
+      {name === "Watch" && danger && (
+        <View
+          style={{
+            position: "absolute", top: -1, right: -7, width: 9, height: 9,
+            borderRadius: 5, backgroundColor: C.live, borderWidth: 1.5, borderColor: "#fff",
+          }}
+        />
+      )}
+    </View>
+  );
+}
 
 function DemoBadge() {
   // Small honest indicator when the API is unreachable and bundled data is shown.
@@ -36,9 +56,13 @@ export default function App() {
   const [sessionReady, setSessionReady] = useState(false);
 
   // Sign in to the API while the user reads the onboarding slides, so the
-  // tabs load live data the moment they enter.
+  // tabs load live data the moment they enter. Prime the Watch state so the
+  // tab badge is truthful before the tab is ever opened.
   useEffect(() => {
-    ensureSession().finally(() => setSessionReady(true));
+    ensureSession()
+      .then(() => getWatch())
+      .catch(() => {})
+      .finally(() => setSessionReady(true));
   }, []);
 
   if (!onboarded) {
@@ -64,7 +88,7 @@ export default function App() {
           tabBarInactiveTintColor: C.faint,
           tabBarStyle: { backgroundColor: "#fff", borderTopColor: C.line, height: 62, paddingBottom: 8 },
           tabBarLabelStyle: { fontSize: 10, fontWeight: "600" },
-          tabBarIcon: () => <Text style={{ fontSize: 18 }}>{ICONS[route.name]}</Text>,
+          tabBarIcon: () => <TabIcon name={route.name} />,
         })}
       >
         <Tab.Screen name="Home" component={Home} />

@@ -191,10 +191,24 @@ export const shareFind = (payload) =>
   );
 
 // ---------- watch ----------
-export const getWatch = () => withFallback(() => req("/watch"), DEMO.watch);
+// The tab bar shows a red dot while an unresolved danger alert exists.
+// Tracked here from the last fetch + local resolves, so live and demo
+// modes behave identically.
+export const watchDanger = observable(false);
+let watchCache = [];
 
-export const resolveAlert = (id, resolution) =>
-  withFallback(
+export const getWatch = () =>
+  withFallback(() => req("/watch"), DEMO.watch).then((data) => {
+    watchCache = data.alerts || [];
+    watchDanger.value = watchCache.some((a) => a.severity === "danger");
+    return data;
+  });
+
+export const resolveAlert = (id, resolution) => {
+  watchCache = watchCache.filter((a) => a._id !== id);
+  watchDanger.value = watchCache.some((a) => a.severity === "danger");
+  return withFallback(
     () => req(`/watch/${id}/resolve`, { method: "POST", body: { resolution } }),
     { ok: true }
   );
+};
