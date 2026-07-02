@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "Savi",
+    "slug": "savi",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#0C3A26"
+    },
+    "android": {
+      "package": "com.savi.app",
+      "adaptiveIcon": { "backgroundColor": "#15583C" }
+    },
+    "ios": { "supportsTablet": false }
+  }
+}
