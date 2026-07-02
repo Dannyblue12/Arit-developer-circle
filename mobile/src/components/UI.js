@@ -1,6 +1,47 @@
-import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import React, { useRef, useEffect } from "react";
+import { View, Text, Pressable, StyleSheet, Animated } from "react-native";
 import { C, naira } from "../theme/theme";
+
+// Gentle pulse placeholder shown while a data section loads — never a blank gap.
+export function Skeleton({ height = 16, width = "100%", radius = 10, style }) {
+  const pulse = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, { toValue: 0.45, duration: 600, useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 1, duration: 600, useNativeDriver: true }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [pulse]);
+  return (
+    <Animated.View
+      style={[{ height, width, borderRadius: radius, backgroundColor: C.mint, opacity: pulse }, style]}
+    />
+  );
+}
+
+// First-mount entrance: fade in while sliding up 12px. Stagger with `delay`.
+export function Entrance({ delay = 0, children, style }) {
+  const anim = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(anim, { toValue: 1, duration: 300, delay, useNativeDriver: true }).start();
+  }, [anim, delay]);
+  return (
+    <Animated.View
+      style={[
+        {
+          opacity: anim,
+          transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }],
+        },
+        style,
+      ]}
+    >
+      {children}
+    </Animated.View>
+  );
+}
 
 // Shared press feedback: everything tappable settles to 0.98 scale.
 export const pressScale = ({ pressed }) =>
