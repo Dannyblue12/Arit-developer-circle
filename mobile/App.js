@@ -3,6 +3,7 @@ import { View, Text } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StatusBar } from "expo-status-bar";
+import { Ionicons } from "@expo/vector-icons";
 
 import Onboarding from "./src/screens/Onboarding";
 import Home from "./src/screens/Home";
@@ -15,16 +16,23 @@ import { usingDemo, ensureSession, watchDanger, getWatch } from "./src/api/clien
 
 const Tab = createBottomTabNavigator();
 
-const ICONS = { Home: "🏠", Spending: "📊", Goals: "🎯", Watch: "🛡️", Prices: "🏷️" };
+// Uniform Ionicons set: outline at rest, filled when active.
+const ICONS = {
+  Home: ["home-outline", "home"],
+  Spending: ["pie-chart-outline", "pie-chart"],
+  Goals: ["flag-outline", "flag"],
+  Watch: ["shield-outline", "shield"],
+  Prices: ["pricetag-outline", "pricetag"],
+};
 
-function TabIcon({ name }) {
+function TabIcon({ name, color, focused }) {
   const danger = useSyncExternalStore(
     (cb) => watchDanger.subscribe(cb),
     () => watchDanger.value
   );
   return (
     <View>
-      <Text style={{ fontSize: 18 }}>{ICONS[name]}</Text>
+      <Ionicons name={ICONS[name][focused ? 1 : 0]} size={21} color={color} />
       {name === "Watch" && danger && (
         <View
           style={{
@@ -92,7 +100,9 @@ export default function App() {
             height: 66, paddingBottom: 10, paddingTop: 6,
           },
           tabBarLabelStyle: { fontSize: 10.5, fontWeight: "700" },
-          tabBarIcon: () => <TabIcon name={route.name} />,
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name={route.name} color={color} focused={focused} />
+          ),
         })}
       >
         <Tab.Screen name="Home" component={Home} />

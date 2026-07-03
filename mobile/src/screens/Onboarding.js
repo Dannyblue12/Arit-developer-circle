@@ -1,25 +1,26 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Animated, Image } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import { Ionicons } from "@expo/vector-icons";
 import { C } from "../theme/theme";
-import { Cta } from "../components/UI";
+import { Cta, IconChip } from "../components/UI";
 import { linkOpay } from "../api/client";
 
 const SLIDES = [
   {
-    emoji: "📍",
+    icon: "location",
     eyebrow: "BEFORE YOU BUY",
     title: "See the real price near you",
     body: "People around you share what they actually paid. Check it first, then buy where it's cheapest — no more guessing.",
   },
   {
-    emoji: "✨",
+    icon: "sparkles",
     eyebrow: "NO TYPING, NO STRESS",
     title: "Your spending, sorted for you",
     body: "Savi reads who you paid and sorts it into food, transport, data and more — on its own. Then it shows you where to spend less without living worse.",
   },
   {
-    emoji: "🛡️",
+    icon: "shield-checkmark",
     eyebrow: "ALWAYS WATCHING",
     title: "Guarded from scams & waste",
     body: "Savi warns you before a payment looks like fraud, and flags silent debits before they drain you. It only warns — it never touches your money.",
@@ -100,14 +101,14 @@ export default function Onboarding({ onDone }) {
           <Text style={st.h}>Two quick permissions</Text>
           <Text style={st.p}>You're in control — change either any time in settings.</Text>
           <View style={st.perm}>
-            <Text style={{ fontSize: 24, marginRight: 12 }}>💳</Text>
+            <IconChip icon="card" size={38} style={{ marginRight: 12 }} />
             <View style={{ flex: 1 }}>
               <Text style={st.permT}>Connect your OPay account</Text>
               <Text style={st.permS}>So Savi can sort your spending for you. It only reads — it can never move your money.</Text>
             </View>
           </View>
           <View style={st.perm}>
-            <Text style={{ fontSize: 24, marginRight: 12 }}>📍</Text>
+            <IconChip icon="location" size={38} style={{ marginRight: 12 }} />
             <View style={{ flex: 1 }}>
               <Text style={st.permT}>Share your location</Text>
               <Text style={st.permS}>So we can show prices near you and pin your finds to the right market.</Text>
@@ -130,7 +131,7 @@ export default function Onboarding({ onDone }) {
         <Text style={{ color: C.muted, fontWeight: "600" }}>Skip</Text>
       </TouchableOpacity>
       <Animated.View style={[st.center, { paddingHorizontal: 32 }, slideIn]}>
-        <View style={st.art}><Text style={{ fontSize: 64 }}>{s.emoji}</Text></View>
+        <View style={st.art}><Ionicons name={s.icon} size={64} color={C.royal} /></View>
         <Text style={st.eyebrow}>{s.eyebrow}</Text>
         <Text style={st.h}>{s.title}</Text>
         <Text style={st.p}>{s.body}</Text>

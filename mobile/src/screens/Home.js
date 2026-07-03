@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useSyncExternalStore } from "react";
 import { View, Text, ScrollView, RefreshControl, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { C, naira } from "../theme/theme";
-import { Card, SectionLabel, ProgressBar, Skeleton, Entrance, IconChip } from "../components/UI";
+import { Card, SectionLabel, ProgressBar, Skeleton, Entrance, IconChip, InlineIcon } from "../components/UI";
 import { getSuggestions, getGoals, getWatch, getFreshPrices, currentUser } from "../api/client";
 
 function timeOfDay() {
@@ -46,7 +46,7 @@ export default function Home({ navigation }) {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.royal} colors={[C.royal]} />}
     >
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-        <Text style={st.hi}>{timeOfDay()}, {user?.name || "friend"} 👋</Text>
+        <Text style={st.hi}>{timeOfDay()}, {user?.name || "friend"}</Text>
         <Image source={require("../../assets/logo-mark.png")} style={st.mark} />
       </View>
       <Text style={st.sub}>Here's how to keep more of your money today.</Text>
@@ -84,7 +84,10 @@ export default function Home({ navigation }) {
               </SectionLabel>
               <TouchableOpacity activeOpacity={0.9} onPress={() => navigation.navigate("Goals")}>
                 <View style={st.goal}>
-                  <Text style={{ color: "#CFE0D5", fontSize: 13 }}>{goal.emoji} {goal.title}</Text>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <InlineIcon emoji={goal.emoji} size={14} color="#CFE0D5" style={{ marginRight: 6 }} />
+                    <Text style={{ color: "#CFE0D5", fontSize: 13 }}>{goal.title}</Text>
+                  </View>
                   <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", marginTop: 8 }}>
                     <Text style={{ color: "#fff", fontSize: 26, fontWeight: "800" }}>{naira(goal.savedAmount)}</Text>
                     <Text style={{ color: "#CFE0D5", fontSize: 12 }}>
@@ -106,7 +109,10 @@ export default function Home({ navigation }) {
                 Savi is watching your money
               </SectionLabel>
               <Card style={{ backgroundColor: C.liveSoft, borderColor: "#F0C4B4" }} onPress={() => navigation.navigate("Watch")}>
-                <Text style={{ fontWeight: "700", color: "#8A3A22", fontSize: 14 }}>🛡️ {alert.title}</Text>
+                <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
+                  <InlineIcon name="shield-half" size={15} color="#8A3A22" style={{ marginRight: 7, marginTop: 1 }} />
+                  <Text style={{ flex: 1, fontWeight: "700", color: "#8A3A22", fontSize: 14 }}>{alert.title}</Text>
+                </View>
                 <Text style={{ color: "#9A5540", fontSize: 12.5, marginTop: 5, lineHeight: 18 }}>{alert.body}</Text>
               </Card>
             </Entrance>

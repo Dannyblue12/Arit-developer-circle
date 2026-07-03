@@ -1,6 +1,30 @@
 import React, { useRef, useEffect } from "react";
 import { View, Text, Pressable, StyleSheet, Animated, Easing } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { C, naira } from "../theme/theme";
+
+// One uniform icon language (Ionicons) across the whole app. The API and
+// demo data still tag records with emoji — that contract stays untouched —
+// and this map translates each tag to its glyph. Unknown tags get a
+// neutral pricetag so nothing ever renders as a raw emoji.
+const ICON_MAP = {
+  "🍲": "restaurant", "🍚": "restaurant", "🍅": "nutrition",
+  "🛺": "car", "🚕": "car",
+  "📶": "wifi", "📱": "phone-portrait",
+  "💪": "barbell", "📦": "cube", "🛒": "cart",
+  "🏠": "home", "👗": "shirt",
+  "👤": "person", "🤝": "people", "❓": "help-circle",
+  "⭐": "star", "✨": "sparkles",
+  "🛡️": "shield-checkmark", "⚠️": "warning", "🔔": "notifications",
+  "💡": "bulb", "🔒": "lock-closed", "📍": "location",
+  "💳": "card", "🎯": "flag", "🏷️": "pricetag", "📊": "pie-chart",
+};
+export const iconFor = (tag) => ICON_MAP[tag] || "pricetag";
+
+// Inline icon for use next to text (headings, footers).
+export function InlineIcon({ name, emoji, size = 14, color = C.royal, style }) {
+  return <Ionicons name={name || iconFor(emoji)} size={size} color={color} style={style} />;
+}
 
 // Gentle pulse placeholder shown while a data section loads — never a blank gap.
 export function Skeleton({ height = 16, width = "100%", radius = 10, style }) {
@@ -66,9 +90,9 @@ export function SectionLabel({ children, right, live }) {
   );
 }
 
-// One consistent emoji treatment across every list — a quiet mint chip —
-// instead of raw emoji floating at assorted sizes.
-export function IconChip({ emoji, size = 40, bg = C.mint, style }) {
+// One consistent icon treatment across every list — an Ionicons glyph in a
+// quiet mint chip. Accepts either a direct icon name or a data emoji tag.
+export function IconChip({ icon, emoji, size = 40, bg = C.mint, color = C.royal, style }) {
   return (
     <View
       style={[
@@ -79,7 +103,7 @@ export function IconChip({ emoji, size = 40, bg = C.mint, style }) {
         style,
       ]}
     >
-      <Text style={{ fontSize: size * 0.5 }}>{emoji}</Text>
+      <Ionicons name={icon || iconFor(emoji)} size={size * 0.48} color={color} />
     </View>
   );
 }

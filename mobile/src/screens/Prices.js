@@ -85,7 +85,7 @@ export default function Prices() {
         )}
 
         {!sharing ? (
-          <Cta label="＋ Share a find & earn ₦50" onPress={() => { setSharing(true); setShared(false); }} />
+          <Cta label="Share a find & earn ₦50" onPress={() => { setSharing(true); setShared(false); }} />
         ) : (
           <Card>
             <Text style={{ fontWeight: "800", color: C.ink, fontSize: 15, marginBottom: 10 }}>Share a find</Text>
@@ -167,7 +167,7 @@ export default function Prices() {
             {rice.length === 0 && others.length === 0 && (
               <Card style={{ marginTop: 18 }}>
                 <Text style={{ color: C.muted, fontSize: 13, textAlign: "center" }}>
-                  No prices in your area yet — share the first find and earn ₦50. 🏷️
+                  No prices in your area yet — share the first find and earn ₦50.
                 </Text>
               </Card>
             )}
