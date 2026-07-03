@@ -4,7 +4,7 @@ import {
   LayoutAnimation, Platform, UIManager, Animated,
 } from "react-native";
 import { C } from "../theme/theme";
-import { Card, Skeleton } from "../components/UI";
+import { Card, Skeleton, IconChip, InlineIcon } from "../components/UI";
 import { getWatch, resolveAlert } from "../api/client";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -12,9 +12,9 @@ if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental
 }
 
 const STYLES = {
-  danger: { bg: C.liveSoft, border: "#F0C4B4", title: "#8A3A22", body: "#9A5540", icon: "⚠️" },
-  warn: { bg: C.goldSoft, border: "#EAD9B6", title: "#6E5410", body: "#7A5410", icon: "🔔" },
-  info: { bg: C.mint, border: C.mint2, title: C.royal, body: "#3E5A4B", icon: "💡" },
+  danger: { bg: C.liveSoft, border: "#F0C4B4", title: "#8A3A22", body: "#9A5540", icon: "warning" },
+  warn: { bg: C.goldSoft, border: "#EAD9B6", title: "#6E5410", body: "#7A5410", icon: "notifications" },
+  info: { bg: C.mint, border: C.mint2, title: C.royal, body: "#3E5A4B", icon: "bulb" },
 };
 
 // Danger cards pulse their border once on mount — a single beat to draw the
@@ -59,7 +59,7 @@ export default function Watch() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: C.paper }}
-      contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
+      contentContainerStyle={{ padding: 20, paddingTop: 28, paddingBottom: 40 }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.royal} colors={[C.royal]} />}
     >
       <Text style={st.h1}>Savi watch</Text>
@@ -75,7 +75,7 @@ export default function Watch() {
       ) : (
         <>
           <View style={st.hero}>
-            <Text style={{ fontSize: 26, marginRight: 14 }}>🛡️</Text>
+            <IconChip icon="shield-checkmark" color="#fff" size={44} bg="rgba(255,255,255,.14)" style={{ marginRight: 14 }} />
             <View>
               <Text style={{ color: "#fff", fontWeight: "700", fontSize: 15 }}>Watching every payment</Text>
               <Text style={{ color: "rgba(255,255,255,.85)", fontSize: 12, marginTop: 2 }}>
@@ -94,9 +94,10 @@ export default function Watch() {
                   a.severity === "danger" && { borderWidth: 0, marginBottom: 0 },
                 ]}
               >
-                <Text style={{ fontWeight: "800", color: s.title, fontSize: 14 }}>
-                  {s.icon} {a.title}
-                </Text>
+                <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
+                  <InlineIcon name={s.icon} size={15} color={s.title} style={{ marginRight: 7, marginTop: 1 }} />
+                  <Text style={{ flex: 1, fontWeight: "800", color: s.title, fontSize: 14 }}>{a.title}</Text>
+                </View>
                 <Text style={{ color: s.body, fontSize: 12.5, marginTop: 5, lineHeight: 18 }}>{a.body}</Text>
                 {a.severity === "danger" ? (
                   <View style={{ flexDirection: "row", marginTop: 12 }}>
@@ -130,16 +131,20 @@ export default function Watch() {
           })}
 
           {alerts.length === 0 && (
-            <Card>
+            <Card style={{ alignItems: "center", paddingVertical: 24 }}>
+              <IconChip icon="shield-checkmark" size={44} style={{ marginBottom: 10 }} />
               <Text style={{ color: C.muted, fontSize: 13, textAlign: "center" }}>
-                All clear. Savi is watching quietly. 🛡️
+                All clear. Savi is watching quietly.
               </Text>
             </Card>
           )}
 
-          <Text style={st.promise}>
-            🔒 Savi only warns you — it never moves or blocks your money itself.
-          </Text>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 10 }}>
+            <InlineIcon name="lock-closed" size={12} color={C.royal} style={{ marginRight: 5 }} />
+            <Text style={st.promise}>
+              Savi only warns you — it never moves or blocks your money itself.
+            </Text>
+          </View>
         </>
       )}
     </ScrollView>
@@ -155,5 +160,5 @@ const st = StyleSheet.create({
   },
   pulseWrap: { borderWidth: 1.5, borderRadius: 19, marginBottom: 12 },
   btn: { flex: 1, borderRadius: 12, paddingVertical: 13, alignItems: "center", minHeight: 44, justifyContent: "center" },
-  promise: { color: C.royal, fontSize: 11.5, textAlign: "center", marginTop: 10, fontWeight: "600" },
+  promise: { color: C.royal, fontSize: 11.5, textAlign: "center", fontWeight: "600" },
 });

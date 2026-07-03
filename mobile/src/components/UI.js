@@ -1,6 +1,30 @@
 import React, { useRef, useEffect } from "react";
 import { View, Text, Pressable, StyleSheet, Animated, Easing } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { C, naira } from "../theme/theme";
+
+// One uniform icon language (Ionicons) across the whole app. The API and
+// demo data still tag records with emoji — that contract stays untouched —
+// and this map translates each tag to its glyph. Unknown tags get a
+// neutral pricetag so nothing ever renders as a raw emoji.
+const ICON_MAP = {
+  "🍲": "restaurant", "🍚": "restaurant", "🍅": "nutrition",
+  "🛺": "car", "🚕": "car",
+  "📶": "wifi", "📱": "phone-portrait",
+  "💪": "barbell", "📦": "cube", "🛒": "cart",
+  "🏠": "home", "👗": "shirt",
+  "👤": "person", "🤝": "people", "❓": "help-circle",
+  "⭐": "star", "✨": "sparkles",
+  "🛡️": "shield-checkmark", "⚠️": "warning", "🔔": "notifications",
+  "💡": "bulb", "🔒": "lock-closed", "📍": "location",
+  "💳": "card", "🎯": "flag", "🏷️": "pricetag", "📊": "pie-chart",
+};
+export const iconFor = (tag) => ICON_MAP[tag] || "pricetag";
+
+// Inline icon for use next to text (headings, footers).
+export function InlineIcon({ name, emoji, size = 14, color = C.royal, style }) {
+  return <Ionicons name={name || iconFor(emoji)} size={size} color={color} style={style} />;
+}
 
 // Gentle pulse placeholder shown while a data section loads — never a blank gap.
 export function Skeleton({ height = 16, width = "100%", radius = 10, style }) {
@@ -57,11 +81,29 @@ export function Card({ children, style, onPress }) {
 export function SectionLabel({ children, right, live }) {
   return (
     <View style={st.secRow}>
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
         {live ? <View style={st.liveDot} /> : null}
-        <Text style={st.secText}>{children}</Text>
+        <Text style={st.secText} numberOfLines={1}>{children}</Text>
       </View>
       {right}
+    </View>
+  );
+}
+
+// One consistent icon treatment across every list — an Ionicons glyph in a
+// quiet mint chip. Accepts either a direct icon name or a data emoji tag.
+export function IconChip({ icon, emoji, size = 40, bg = C.mint, color = C.royal, style }) {
+  return (
+    <View
+      style={[
+        {
+          width: size, height: size, borderRadius: size * 0.35,
+          backgroundColor: bg, alignItems: "center", justifyContent: "center",
+        },
+        style,
+      ]}
+    >
+      <Ionicons name={icon || iconFor(emoji)} size={size * 0.48} color={color} />
     </View>
   );
 }
@@ -130,7 +172,10 @@ const st = StyleSheet.create({
     flexDirection: "row", justifyContent: "space-between",
     alignItems: "center", marginTop: 18, marginBottom: 10,
   },
-  secText: { fontSize: 13.5, fontWeight: "700", color: C.ink },
+  secText: {
+    fontSize: 11.5, fontWeight: "700", color: C.muted,
+    letterSpacing: 1.1, textTransform: "uppercase",
+  },
   liveDot: {
     width: 8, height: 8, borderRadius: 4, backgroundColor: C.live,
     marginRight: 8,

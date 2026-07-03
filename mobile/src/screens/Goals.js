@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, ScrollView, RefreshControl, StyleSheet } from "react-native";
 import { C, naira } from "../theme/theme";
-import { Card, SectionLabel, ProgressBar, Cta, Skeleton, Entrance } from "../components/UI";
+import { Card, SectionLabel, ProgressBar, Cta, Skeleton, Entrance, IconChip, InlineIcon } from "../components/UI";
 import { getGoals } from "../api/client";
 
 export default function Goals() {
@@ -22,7 +22,7 @@ export default function Goals() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: C.paper }}
-      contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
+      contentContainerStyle={{ padding: 20, paddingTop: 28, paddingBottom: 40 }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.royal} colors={[C.royal]} />}
     >
       <Text style={st.h1}>Your goals</Text>
@@ -42,7 +42,10 @@ export default function Goals() {
             <>
               <Entrance>
                 <View style={st.hero}>
-                  <Text style={{ color: "#CFE0D5", fontSize: 13 }}>{main.emoji} {main.title}</Text>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <InlineIcon emoji={main.emoji} size={14} color="#CFE0D5" style={{ marginRight: 6 }} />
+                    <Text style={{ color: "#CFE0D5", fontSize: 13 }}>{main.title}</Text>
+                  </View>
                   <Text style={{ color: "#fff", fontSize: 24, fontWeight: "800", marginTop: 4 }}>
                     {naira(main.targetAmount)} goal
                   </Text>
@@ -65,7 +68,7 @@ export default function Goals() {
                 <Entrance key={i} delay={80 + i * 60}>
                   <Card>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
-                      <Text style={{ fontSize: 20, marginRight: 12 }}>{c.emoji}</Text>
+                      <IconChip emoji={c.emoji} size={36} bg={C.goldSoft} style={{ marginRight: 12 }} />
                       <Text style={{ flex: 1, fontWeight: "600", color: C.ink, fontSize: 13.5 }}>{c.label}</Text>
                       <Text style={{ fontWeight: "800", color: C.gold }}>+{naira(c.amount)}</Text>
                     </View>
@@ -84,7 +87,7 @@ export default function Goals() {
           {goals.length === 0 && (
             <Card>
               <Text style={{ color: C.muted, fontSize: 13, textAlign: "center" }}>
-                No goals yet. When Savi finds you a saving, it'll ask what you're chasing. 🎯
+                No goals yet. When Savi finds you a saving, it'll ask what you're chasing.
               </Text>
             </Card>
           )}
@@ -95,7 +98,7 @@ export default function Goals() {
               {goals.slice(1).map((g) => (
                 <Card key={g._id}>
                   <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
-                    <Text style={{ fontSize: 20, marginRight: 10 }}>{g.emoji}</Text>
+                    <IconChip emoji={g.emoji} size={36} style={{ marginRight: 10 }} />
                     <Text style={{ fontWeight: "700", color: C.ink, flex: 1 }}>{g.title}</Text>
                     <Text style={{ color: C.muted, fontSize: 12 }}>
                       {naira(g.savedAmount)} of {naira(g.targetAmount)}
@@ -108,9 +111,12 @@ export default function Goals() {
           )}
 
           <Card style={{ backgroundColor: C.goldSoft, borderColor: "#EAD9B6" }}>
-            <Text style={{ fontWeight: "700", color: "#6E5410", fontSize: 13.5 }}>
-              ⭐ Savi suggests: an emergency cushion
-            </Text>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <InlineIcon name="star" size={14} color="#6E5410" style={{ marginRight: 7 }} />
+              <Text style={{ fontWeight: "700", color: "#6E5410", fontSize: 13.5 }}>
+                Savi suggests: an emergency cushion
+              </Text>
+            </View>
             <Text style={{ color: "#7A5410", fontSize: 12, marginTop: 4, lineHeight: 17 }}>
               You restock ~₦60k monthly. A ₦30k cushion would cover a slow week — want to start one?
             </Text>
