@@ -4,7 +4,7 @@ import {
   RefreshControl, StyleSheet, KeyboardAvoidingView, Platform, Keyboard,
 } from "react-native";
 import { C, naira } from "../theme/theme";
-import { Card, SectionLabel, Cta, Pill, Skeleton, Entrance } from "../components/UI";
+import { Card, SectionLabel, Cta, Pill, Skeleton, Entrance, IconChip } from "../components/UI";
 import { getPrices, shareFind } from "../api/client";
 
 export default function Prices() {
@@ -125,7 +125,9 @@ export default function Prices() {
                 {rice.map((f, i) => (
                   <Card key={f._id} style={i === 0 ? { backgroundColor: C.mint, borderColor: C.mint2 } : null}>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
-                      <Text style={{ width: 24, color: i === 0 ? C.royal : C.faint, fontWeight: "800" }}>{i + 1}</Text>
+                      <View style={[st.rank, i === 0 && { backgroundColor: "#fff" }]}>
+                        <Text style={{ color: i === 0 ? C.royal : C.faint, fontWeight: "800", fontSize: 12.5 }}>{i + 1}</Text>
+                      </View>
                       <View style={{ flex: 1 }}>
                         <Text style={{ fontWeight: "700", color: C.ink, fontSize: 14 }}>{f.vendor}</Text>
                         <Text style={{ color: C.muted, fontSize: 11.5, marginTop: 2 }}>
@@ -134,7 +136,7 @@ export default function Prices() {
                       </View>
                       <View style={{ alignItems: "flex-end" }}>
                         <Text style={{ fontWeight: "800", color: i === 0 ? C.royal : C.ink, fontSize: 16 }}>{naira(f.price)}</Text>
-                        {i === 0 && <Pill text="CHEAPEST" />}
+                        {i === 0 && <Pill text="CHEAPEST" bg="#fff" />}
                       </View>
                     </View>
                   </Card>
@@ -148,7 +150,7 @@ export default function Prices() {
                 {others.map((f) => (
                   <Card key={f._id}>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
-                      <Text style={{ fontSize: 24, marginRight: 12 }}>{f.emoji}</Text>
+                      <IconChip emoji={f.emoji} style={{ marginRight: 12 }} />
                       <View style={{ flex: 1 }}>
                         <Text style={{ fontWeight: "700", color: C.ink, fontSize: 14 }}>{f.itemLabel}</Text>
                         <Text style={{ color: C.muted, fontSize: 11.5, marginTop: 2 }}>
@@ -189,5 +191,9 @@ const st = StyleSheet.create({
     color: C.ink, marginBottom: 10, backgroundColor: C.paper, minHeight: 44,
   },
   errHint: { color: C.live, fontSize: 12, fontWeight: "600", marginBottom: 4, marginTop: 2 },
+  rank: {
+    width: 26, height: 26, borderRadius: 13, backgroundColor: C.mint,
+    alignItems: "center", justifyContent: "center", marginRight: 10,
+  },
   note: { color: C.muted, fontSize: 11.5, textAlign: "center", marginTop: 14, lineHeight: 17 },
 });

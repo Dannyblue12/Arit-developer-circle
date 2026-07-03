@@ -57,11 +57,29 @@ export function Card({ children, style, onPress }) {
 export function SectionLabel({ children, right, live }) {
   return (
     <View style={st.secRow}>
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
         {live ? <View style={st.liveDot} /> : null}
-        <Text style={st.secText}>{children}</Text>
+        <Text style={st.secText} numberOfLines={1}>{children}</Text>
       </View>
       {right}
+    </View>
+  );
+}
+
+// One consistent emoji treatment across every list — a quiet mint chip —
+// instead of raw emoji floating at assorted sizes.
+export function IconChip({ emoji, size = 40, bg = C.mint, style }) {
+  return (
+    <View
+      style={[
+        {
+          width: size, height: size, borderRadius: size * 0.35,
+          backgroundColor: bg, alignItems: "center", justifyContent: "center",
+        },
+        style,
+      ]}
+    >
+      <Text style={{ fontSize: size * 0.5 }}>{emoji}</Text>
     </View>
   );
 }
@@ -130,7 +148,10 @@ const st = StyleSheet.create({
     flexDirection: "row", justifyContent: "space-between",
     alignItems: "center", marginTop: 18, marginBottom: 10,
   },
-  secText: { fontSize: 13.5, fontWeight: "700", color: C.ink },
+  secText: {
+    fontSize: 11.5, fontWeight: "700", color: C.muted,
+    letterSpacing: 1.1, textTransform: "uppercase",
+  },
   liveDot: {
     width: 8, height: 8, borderRadius: 4, backgroundColor: C.live,
     marginRight: 8,

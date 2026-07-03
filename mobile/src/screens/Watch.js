@@ -4,7 +4,7 @@ import {
   LayoutAnimation, Platform, UIManager, Animated,
 } from "react-native";
 import { C } from "../theme/theme";
-import { Card, Skeleton } from "../components/UI";
+import { Card, Skeleton, IconChip } from "../components/UI";
 import { getWatch, resolveAlert } from "../api/client";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -75,7 +75,7 @@ export default function Watch() {
       ) : (
         <>
           <View style={st.hero}>
-            <Text style={{ fontSize: 26, marginRight: 14 }}>🛡️</Text>
+            <IconChip emoji="🛡️" size={44} bg="rgba(255,255,255,.14)" style={{ marginRight: 14 }} />
             <View>
               <Text style={{ color: "#fff", fontWeight: "700", fontSize: 15 }}>Watching every payment</Text>
               <Text style={{ color: "rgba(255,255,255,.85)", fontSize: 12, marginTop: 2 }}>

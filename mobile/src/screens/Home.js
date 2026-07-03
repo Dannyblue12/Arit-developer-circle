@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useSyncExternalStore } from "react";
 import { View, Text, ScrollView, RefreshControl, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { C, naira } from "../theme/theme";
-import { Card, SectionLabel, ProgressBar, Skeleton, Entrance } from "../components/UI";
+import { Card, SectionLabel, ProgressBar, Skeleton, Entrance, IconChip } from "../components/UI";
 import { getSuggestions, getGoals, getWatch, getFreshPrices, currentUser } from "../api/client";
 
 function timeOfDay() {
@@ -127,7 +127,7 @@ export default function Home({ navigation }) {
             {fresh.slice(0, 2).map((f) => (
               <Card key={f._id} onPress={() => navigation.navigate("Prices")}>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Text style={{ fontSize: 26, marginRight: 12 }}>{f.emoji}</Text>
+                  <IconChip emoji={f.emoji} style={{ marginRight: 12 }} />
                   <View style={{ flex: 1 }}>
                     <Text style={{ fontWeight: "700", color: C.ink, fontSize: 14 }}>{f.itemLabel}</Text>
                     <Text style={{ color: C.muted, fontSize: 12, marginTop: 2 }}>

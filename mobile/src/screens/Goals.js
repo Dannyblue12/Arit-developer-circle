@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, ScrollView, RefreshControl, StyleSheet } from "react-native";
 import { C, naira } from "../theme/theme";
-import { Card, SectionLabel, ProgressBar, Cta, Skeleton, Entrance } from "../components/UI";
+import { Card, SectionLabel, ProgressBar, Cta, Skeleton, Entrance, IconChip } from "../components/UI";
 import { getGoals } from "../api/client";
 
 export default function Goals() {
@@ -65,7 +65,7 @@ export default function Goals() {
                 <Entrance key={i} delay={80 + i * 60}>
                   <Card>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
-                      <Text style={{ fontSize: 20, marginRight: 12 }}>{c.emoji}</Text>
+                      <IconChip emoji={c.emoji} size={36} bg={C.goldSoft} style={{ marginRight: 12 }} />
                       <Text style={{ flex: 1, fontWeight: "600", color: C.ink, fontSize: 13.5 }}>{c.label}</Text>
                       <Text style={{ fontWeight: "800", color: C.gold }}>+{naira(c.amount)}</Text>
                     </View>
@@ -95,7 +95,7 @@ export default function Goals() {
               {goals.slice(1).map((g) => (
                 <Card key={g._id}>
                   <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
-                    <Text style={{ fontSize: 20, marginRight: 10 }}>{g.emoji}</Text>
+                    <IconChip emoji={g.emoji} size={36} style={{ marginRight: 10 }} />
                     <Text style={{ fontWeight: "700", color: C.ink, flex: 1 }}>{g.title}</Text>
                     <Text style={{ color: C.muted, fontSize: 12 }}>
                       {naira(g.savedAmount)} of {naira(g.targetAmount)}

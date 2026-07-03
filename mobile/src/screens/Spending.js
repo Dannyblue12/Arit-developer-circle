@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, ScrollView, TouchableOpacity, RefreshControl, StyleSheet } from "react-native";
 import { C, naira } from "../theme/theme";
-import { Card, SectionLabel, Pill, Skeleton, Entrance } from "../components/UI";
+import { Card, SectionLabel, Pill, Skeleton, Entrance, IconChip } from "../components/UI";
 import { getSummary, getSuggestions, getTidy, tagTransaction } from "../api/client";
 
 const TAG_OPTIONS = ["stock", "personal", "loan", "food"];
@@ -93,7 +93,7 @@ export default function Spending() {
               <Card style={i === 0 ? { borderColor: C.royal, borderWidth: 1.5 } : null}>
                 {i === 0 && <Pill text="START HERE · EASIEST WIN" bg={C.goldSoft} color={C.gold} />}
                 <View style={{ flexDirection: "row", marginTop: i === 0 ? 10 : 0 }}>
-                  <Text style={{ fontSize: 24, marginRight: 10 }}>{s.emoji}</Text>
+                  <IconChip emoji={s.emoji} size={38} style={{ marginRight: 12 }} />
                   <View style={{ flex: 1 }}>
                     <Text style={{ fontWeight: "800", color: C.ink, fontSize: 15 }}>{s.title}</Text>
                     <Text style={{ color: C.muted, fontSize: 12.5, marginTop: 4, lineHeight: 18 }}>{s.detail}</Text>
@@ -117,7 +117,7 @@ export default function Spending() {
           {summary.categories.map((c) => (
             <Card key={c.category}>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Text style={{ fontSize: 22, marginRight: 12 }}>{c.emoji}</Text>
+                <IconChip emoji={c.emoji} style={{ marginRight: 12 }} />
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontWeight: "700", color: C.ink, fontSize: 14 }}>{c.label}</Text>
                   <Text style={{ color: C.muted, fontSize: 11.5, marginTop: 2 }}>{c.txCount} payments</Text>
@@ -175,7 +175,7 @@ const st = StyleSheet.create({
   h1: { fontSize: 24, fontWeight: "800", color: C.ink },
   sub: { fontSize: 13, color: C.muted, marginTop: 4, marginBottom: 14 },
   k: { fontSize: 10, letterSpacing: 1.2, color: C.muted, fontWeight: "700" },
-  big: { fontSize: 32, fontWeight: "800", color: C.ink, marginTop: 6 },
+  big: { fontSize: 32, fontWeight: "800", color: C.ink, marginTop: 6, fontVariant: ["tabular-nums"] },
   evidence: { backgroundColor: C.mint, borderRadius: 10, padding: 9, marginTop: 10 },
   evT: { color: C.royal, fontSize: 11.5, fontWeight: "600" },
   gotIt: {
