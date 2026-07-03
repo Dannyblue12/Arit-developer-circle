@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useSyncExternalStore } from "react";
-import { View, Text, ScrollView, RefreshControl, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, ScrollView, RefreshControl, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { C, naira } from "../theme/theme";
 import { Card, SectionLabel, ProgressBar, Skeleton, Entrance } from "../components/UI";
 import { getSuggestions, getGoals, getWatch, getFreshPrices, currentUser } from "../api/client";
@@ -42,10 +42,13 @@ export default function Home({ navigation }) {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: C.paper }}
-      contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
+      contentContainerStyle={{ padding: 20, paddingTop: 28, paddingBottom: 40 }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.royal} colors={[C.royal]} />}
     >
-      <Text style={st.hi}>{timeOfDay()}, {user?.name || "friend"} 👋</Text>
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+        <Text style={st.hi}>{timeOfDay()}, {user?.name || "friend"} 👋</Text>
+        <Image source={require("../../assets/logo-mark.png")} style={st.mark} />
+      </View>
       <Text style={st.sub}>Here's how to keep more of your money today.</Text>
 
       {loading ? (
@@ -144,6 +147,7 @@ export default function Home({ navigation }) {
 
 const st = StyleSheet.create({
   hi: { fontSize: 26, fontWeight: "800", color: C.ink },
+  mark: { width: 27, height: 28, resizeMode: "contain" },
   sub: { fontSize: 13, color: C.muted, marginTop: 4, marginBottom: 16 },
   more: { color: C.royal, fontSize: 12, fontWeight: "700" },
   move: { backgroundColor: C.royal, borderRadius: 22, padding: 20 },

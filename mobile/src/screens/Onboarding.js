@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Animated } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Image } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { C } from "../theme/theme";
 import { Cta } from "../components/UI";
@@ -76,12 +76,12 @@ export default function Onboarding({ onDone }) {
 
   if (step === -1) {
     return (
-      <View style={[st.wrap, { backgroundColor: C.royalDeep }]}>
-        <StatusBar style="light" />
+      <View style={[st.wrap, { backgroundColor: C.brandDeep }]}>
+        <StatusBar hidden />
         <Animated.View style={[st.center, { opacity: anim }]}>
-          <View style={st.logo}><Text style={{ fontSize: 42 }}>📍</Text></View>
-          <Text style={st.brand}>Savi</Text>
-          <Text style={st.tag}>Spend like you <Text style={{ fontStyle: "italic", color: C.goldSoft }}>sabi</Text>.</Text>
+          <Image source={require("../../assets/logo-mark.png")} style={st.logo} />
+          <Text style={st.brand}>savi</Text>
+          <Text style={st.tag}>spend like you <Text style={{ fontStyle: "italic", color: C.goldSoft }}>sabi</Text></Text>
         </Animated.View>
         <View style={{ padding: 24 }}>
           <Cta label="Get started" onPress={() => setStep(0)} />
@@ -94,8 +94,9 @@ export default function Onboarding({ onDone }) {
   if (step === 3) {
     return (
       <View style={st.wrap}>
-        <StatusBar style="dark" />
+        <StatusBar hidden />
         <Animated.View style={[st.center, { paddingHorizontal: 28 }, slideIn]}>
+          <Image source={require("../../assets/logo-mark.png")} style={st.markSm} />
           <Text style={st.h}>Two quick permissions</Text>
           <Text style={st.p}>You're in control — change either any time in settings.</Text>
           <View style={st.perm}>
@@ -124,7 +125,7 @@ export default function Onboarding({ onDone }) {
   const s = SLIDES[step];
   return (
     <View style={st.wrap}>
-      <StatusBar style="dark" />
+      <StatusBar hidden />
       <TouchableOpacity style={st.skip} onPress={onDone} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
         <Text style={{ color: C.muted, fontWeight: "600" }}>Skip</Text>
       </TouchableOpacity>
@@ -148,13 +149,11 @@ export default function Onboarding({ onDone }) {
 const st = StyleSheet.create({
   wrap: { flex: 1, backgroundColor: C.paper },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  logo: {
-    width: 96, height: 96, borderRadius: 28, backgroundColor: C.royal,
-    alignItems: "center", justifyContent: "center", marginBottom: 22,
-  },
-  brand: { fontSize: 48, fontWeight: "800", color: "#fff" },
-  tag: { fontSize: 16, color: "#CFE0D5", marginTop: 10 },
-  skip: { alignSelf: "flex-end", padding: 20 },
+  logo: { width: 118, height: 124, marginBottom: 26, resizeMode: "contain" },
+  markSm: { width: 42, height: 44, marginBottom: 18, resizeMode: "contain" },
+  brand: { fontSize: 46, fontWeight: "800", color: "#fff", letterSpacing: 1 },
+  tag: { fontSize: 16, color: "#CFE0D5", marginTop: 8, letterSpacing: 2.5 },
+  skip: { alignSelf: "flex-end", padding: 20, paddingTop: 26 },
   art: {
     width: 160, height: 160, borderRadius: 36, backgroundColor: C.mint,
     alignItems: "center", justifyContent: "center", marginBottom: 26,

@@ -9,6 +9,9 @@ export const C = {
   royal: "#15583C",
   royal2: "#1A7049",
   royalDeep: "#0C3A26",
+  // Sampled from the Savi logo asset — used where the mark must blend
+  // seamlessly (splash, welcome screen, app icon background).
+  brandDeep: "#02352B",
   mint: "#E7F2EB",
   mint2: "#D6EADD",
   gold: "#B9822A",

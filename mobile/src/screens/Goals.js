@@ -22,7 +22,7 @@ export default function Goals() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: C.paper }}
-      contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
+      contentContainerStyle={{ padding: 20, paddingTop: 28, paddingBottom: 40 }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.royal} colors={[C.royal]} />}
     >
       <Text style={st.h1}>Your goals</Text>

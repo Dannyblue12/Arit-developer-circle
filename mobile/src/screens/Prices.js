@@ -67,7 +67,7 @@ export default function Prices() {
       <ScrollView
         ref={scrollRef}
         style={{ flex: 1, backgroundColor: C.paper }}
-        contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
+        contentContainerStyle={{ padding: 20, paddingTop: 28, paddingBottom: 40 }}
         keyboardShouldPersistTaps="handled"
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.royal} colors={[C.royal]} />}
       >

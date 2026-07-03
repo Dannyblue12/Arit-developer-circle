@@ -45,7 +45,7 @@ function DemoBadge() {
   );
   if (!demo) return null;
   return (
-    <View style={{ position: "absolute", top: 46, alignSelf: "center", backgroundColor: C.goldSoft, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 4, zIndex: 10 }}>
+    <View style={{ position: "absolute", top: 16, alignSelf: "center", backgroundColor: C.goldSoft, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 4, zIndex: 10 }}>
       <Text style={{ color: C.gold, fontSize: 10.5, fontWeight: "700" }}>demo data · API offline</Text>
     </View>
   );
@@ -79,15 +79,19 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <StatusBar style="dark" />
+      {/* Immersive full-screen: the device status bar stays hidden in-app. */}
+      <StatusBar hidden />
       <DemoBadge />
       <Tab.Navigator
         screenOptions={({ route }) => ({
           headerShown: false,
           tabBarActiveTintColor: C.royal,
           tabBarInactiveTintColor: C.faint,
-          tabBarStyle: { backgroundColor: "#fff", borderTopColor: C.line, height: 62, paddingBottom: 8 },
-          tabBarLabelStyle: { fontSize: 10, fontWeight: "600" },
+          tabBarStyle: {
+            backgroundColor: "#fff", borderTopColor: C.line, borderTopWidth: 1,
+            height: 66, paddingBottom: 10, paddingTop: 6,
+          },
+          tabBarLabelStyle: { fontSize: 10.5, fontWeight: "700" },
           tabBarIcon: () => <TabIcon name={route.name} />,
         })}
       >
