@@ -1,39 +1,60 @@
-// Savi design tokens — white + royal green identity from the product spec.
+// Wellsent design tokens — "Night & Gold".
+// Indigo is the brand. Gold is reserved for money landing. Green / orange /
+// red are reserved for Shield verdicts, so they never appear as decoration.
 export const C = {
-  paper: "#FBFBF7",
+  indigo: "#3538CD",
+  indigoDeep: "#2628A3",
+  indigoTint: "#EEF0FF",
+  indigoLine: "#D9DCFB",
+  ink: "#10153A",
+  muted: "#5B6178",
+  faint: "#9AA0B4",
+  line: "#E7E8EF",
+  paper: "#FAF9F6",
   card: "#FFFFFF",
-  ink: "#0E2419",
-  muted: "#5F7269",
-  faint: "#94A39B",
-  line: "#E8ECE7",
-  royal: "#15583C",
-  royal2: "#1A7049",
-  royalDeep: "#0C3A26",
-  // Sampled from the Savi logo asset — used where the mark must blend
-  // seamlessly (splash, welcome screen, app icon background).
-  brandDeep: "#02352B",
-  mint: "#E7F2EB",
-  mint2: "#D6EADD",
-  gold: "#B9822A",
-  goldSoft: "#F4E9D2",
-  live: "#DD5C39",
-  liveSoft: "#FBE7DF",
+  gold: "#F5B800",
+  goldSoft: "#FFF4CC",
+  goldInk: "#5C4500",
+  safe: "#12B76A",
+  safeSoft: "#E7F7EE",
+  safeInk: "#0B6B3E",
+  caution: "#EA580C",
+  cautionSoft: "#FDEEE3",
+  cautionInk: "#8A3207",
+  danger: "#D92D20",
+  dangerSoft: "#FDE9E7",
+  dangerInk: "#8F1D14",
 };
 
-export const S = {
-  screen: { flex: 1, backgroundColor: C.paper },
-  pad: { paddingHorizontal: 20 },
-  h1: { fontSize: 26, fontWeight: "800", color: C.ink },
-  sub: { fontSize: 13, color: C.muted, marginTop: 4 },
-  card: {
-    backgroundColor: C.card,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: C.line,
-    padding: 16,
-  },
-  row: { flexDirection: "row", alignItems: "center" },
-  mono: { fontVariant: ["tabular-nums"], fontWeight: "700" },
+// Plus Jakarta Sans, loaded in App.js. Use fontFamily (not fontWeight) so
+// Android renders the right cut.
+export const F = {
+  regular: "PlusJakartaSans_400Regular",
+  medium: "PlusJakartaSans_500Medium",
+  semi: "PlusJakartaSans_600SemiBold",
+  bold: "PlusJakartaSans_700Bold",
+  heavy: "PlusJakartaSans_800ExtraBold",
 };
 
-export const naira = (n) => `₦${Number(n || 0).toLocaleString("en-NG")}`;
+// Demo exchange rate — update on pitch day.
+export const NGN_PER_USD = 1328;
+
+const group = (s) => s.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+// $21.25, $300 (no trailing .00)
+export function usd(n) {
+  const v = Math.round((Number(n) || 0) * 100) / 100;
+  const [i, d] = v.toFixed(2).split(".");
+  return `$${group(i)}${d === "00" ? "" : "." + d}`;
+}
+
+export function naira(n) {
+  return `₦${group(String(Math.round(Number(n) || 0)))}`;
+}
+
+export const toNaira = (dollars) => (Number(dollars) || 0) * NGN_PER_USD;
+
+export const shortAddr = (a = "") => (a.length > 14 ? `${a.slice(0, 6)}…${a.slice(-6)}` : a);
+
+export const initials = (name = "") =>
+  name.split(/\s+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase();

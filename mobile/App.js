@@ -1,116 +1,166 @@
-import React, { useState, useEffect, useSyncExternalStore } from "react";
-import { View, Text } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
+import React, { useMemo, useRef } from "react";
+import { View } from "react-native";
+import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import {
+  useFonts,
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_500Medium,
+  PlusJakartaSans_600SemiBold,
+  PlusJakartaSans_700Bold,
+  PlusJakartaSans_800ExtraBold,
+} from "@expo-google-fonts/plus-jakarta-sans";
 
-import Onboarding from "./src/screens/Onboarding";
-import Home from "./src/screens/Home";
-import Spending from "./src/screens/Spending";
-import Goals from "./src/screens/Goals";
-import Watch from "./src/screens/Watch";
-import Prices from "./src/screens/Prices";
-import { C } from "./src/theme/theme";
-import { usingDemo, ensureSession, watchDanger, getWatch } from "./src/api/client";
+import { C, F } from "./src/theme/theme";
+import { StoreProvider, useStore, bootFromUrl } from "./src/state/store";
 
+import Welcome from "./src/screens/shared/Welcome";
+import SignUp from "./src/screens/shared/SignUp";
+import ConnectCleva from "./src/screens/shared/ConnectCleva";
+import Pair from "./src/screens/shared/Pair";
+import ShieldCheck from "./src/screens/shared/ShieldCheck";
+
+import StudentHome from "./src/screens/student/StudentHome";
+import PlanInvite from "./src/screens/student/PlanInvite";
+import PaydayLanded from "./src/screens/student/PaydayLanded";
+import StudentAsks from "./src/screens/student/StudentAsks";
+import AskNew from "./src/screens/student/AskNew";
+import Emergency from "./src/screens/student/Emergency";
+import PullForward from "./src/screens/student/PullForward";
+import Fees from "./src/screens/student/Fees";
+import CheckIn from "./src/screens/student/CheckIn";
+import Activity from "./src/screens/student/Activity";
+import StudentMe from "./src/screens/student/StudentMe";
+
+import SponsorHome from "./src/screens/sponsor/SponsorHome";
+import CreatePlan from "./src/screens/sponsor/CreatePlan";
+import FundVault from "./src/screens/sponsor/FundVault";
+import SponsorAsks from "./src/screens/sponsor/SponsorAsks";
+import AskDetail from "./src/screens/sponsor/AskDetail";
+import ScamCheck from "./src/screens/sponsor/ScamCheck";
+import PlanDetail from "./src/screens/sponsor/PlanDetail";
+import SponsorMe from "./src/screens/sponsor/SponsorMe";
+
+const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Uniform Ionicons set: outline at rest, filled when active.
+// Outline at rest, filled when active.
 const ICONS = {
-  Home: ["home-outline", "home"],
-  Spending: ["pie-chart-outline", "pie-chart"],
-  Goals: ["flag-outline", "flag"],
-  Watch: ["shield-outline", "shield"],
-  Prices: ["pricetag-outline", "pricetag"],
+  Home: "home",
+  Asks: "chatbubbles",
+  Activity: "time",
+  Me: "person-circle",
 };
 
-function TabIcon({ name, color, focused }) {
-  const danger = useSyncExternalStore(
-    (cb) => watchDanger.subscribe(cb),
-    () => watchDanger.value
-  );
+const tabOptions = ({ route }) => ({
+  headerShown: false,
+  tabBarActiveTintColor: C.indigo,
+  tabBarInactiveTintColor: C.faint,
+  tabBarStyle: { backgroundColor: "#fff", borderTopColor: C.line, height: 66, paddingBottom: 10, paddingTop: 6 },
+  tabBarLabelStyle: { fontFamily: F.semi, fontSize: 11 },
+  tabBarBadgeStyle: { backgroundColor: C.gold, color: C.ink, fontFamily: F.bold, fontSize: 11 },
+  tabBarIcon: ({ color, focused }) => (
+    <Ionicons name={focused ? ICONS[route.name] : `${ICONS[route.name]}-outline`} size={22} color={color} />
+  ),
+});
+
+function StudentTabs() {
+  const { state } = useStore();
+  const waiting = state.asks.filter((k) => k.status === "pending").length;
   return (
-    <View>
-      <Ionicons name={ICONS[name][focused ? 1 : 0]} size={21} color={color} />
-      {name === "Watch" && danger && (
-        <View
-          style={{
-            position: "absolute", top: -1, right: -7, width: 9, height: 9,
-            borderRadius: 5, backgroundColor: C.live, borderWidth: 1.5, borderColor: "#fff",
-          }}
-        />
-      )}
-    </View>
+    <Tab.Navigator screenOptions={tabOptions}>
+      <Tab.Screen name="Home" component={StudentHome} />
+      <Tab.Screen name="Asks" component={StudentAsks} options={{ tabBarBadge: waiting || undefined }} />
+      <Tab.Screen name="Activity" component={Activity} />
+      <Tab.Screen name="Me" component={StudentMe} />
+    </Tab.Navigator>
   );
 }
 
-function DemoBadge() {
-  // Small honest indicator when the API is unreachable and bundled data is shown.
-  const demo = useSyncExternalStore(
-    (cb) => usingDemo.subscribe(cb),
-    () => usingDemo.value
-  );
-  if (!demo) return null;
+function SponsorTabs() {
+  const { state } = useStore();
+  const waiting = state.asks.filter((k) => k.status === "pending").length;
   return (
-    <View style={{ position: "absolute", top: 16, alignSelf: "center", backgroundColor: C.goldSoft, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 4, zIndex: 10 }}>
-      <Text style={{ color: C.gold, fontSize: 10.5, fontWeight: "700" }}>demo data · API offline</Text>
-    </View>
+    <Tab.Navigator screenOptions={tabOptions}>
+      <Tab.Screen name="Home" component={SponsorHome} />
+      <Tab.Screen name="Asks" component={SponsorAsks} options={{ tabBarBadge: waiting || undefined }} />
+      <Tab.Screen name="Me" component={SponsorMe} />
+    </Tab.Navigator>
+  );
+}
+
+const navTheme = { ...DefaultTheme, colors: { ...DefaultTheme.colors, background: C.paper, primary: C.indigo } };
+
+function Root({ initialScreen }) {
+  const { state } = useStore();
+  // Keyed by who is using the phone, so switching role in the demo starts
+  // that person's app fresh.
+  const group = !state.onboarded ? "onboarding" : state.role;
+  // ?screen= only applies to the first screen group shown.
+  const firstGroup = useRef(group);
+  const initial = group === firstGroup.current ? initialScreen : undefined;
+  return (
+    <NavigationContainer theme={navTheme}>
+      <Stack.Navigator
+        key={group}
+        initialRouteName={initial}
+        screenOptions={{ headerShown: false, animation: "slide_from_right", contentStyle: { backgroundColor: C.paper } }}
+      >
+        {group === "onboarding" ? (
+          <>
+            <Stack.Screen name="Welcome" component={Welcome} />
+            <Stack.Screen name="SignUp" component={SignUp} />
+            <Stack.Screen name="ConnectCleva" component={ConnectCleva} />
+            <Stack.Screen name="Pair" component={Pair} />
+          </>
+        ) : group === "student" ? (
+          <>
+            <Stack.Screen name="StudentTabs" component={StudentTabs} />
+            <Stack.Screen name="PlanInvite" component={PlanInvite} />
+            <Stack.Screen name="PaydayLanded" component={PaydayLanded} options={{ animation: "fade" }} />
+            <Stack.Screen name="AskNew" component={AskNew} />
+            <Stack.Screen name="Emergency" component={Emergency} />
+            <Stack.Screen name="PullForward" component={PullForward} />
+            <Stack.Screen name="Fees" component={Fees} />
+            <Stack.Screen name="CheckIn" component={CheckIn} />
+            <Stack.Screen name="ShieldCheck" component={ShieldCheck} />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="SponsorTabs" component={SponsorTabs} />
+            <Stack.Screen name="CreatePlan" component={CreatePlan} />
+            <Stack.Screen name="FundVault" component={FundVault} />
+            <Stack.Screen name="AskDetail" component={AskDetail} />
+            <Stack.Screen name="ScamCheck" component={ScamCheck} />
+            <Stack.Screen name="PlanDetail" component={PlanDetail} />
+            <Stack.Screen name="ShieldCheck" component={ShieldCheck} />
+          </>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
 export default function App() {
-  const [onboarded, setOnboarded] = useState(false);
-  const [sessionReady, setSessionReady] = useState(false);
+  const [fontsLoaded] = useFonts({
+    PlusJakartaSans_400Regular,
+    PlusJakartaSans_500Medium,
+    PlusJakartaSans_600SemiBold,
+    PlusJakartaSans_700Bold,
+    PlusJakartaSans_800ExtraBold,
+  });
+  const boot = useMemo(() => bootFromUrl(), []);
 
-  // Sign in to the API while the user reads the onboarding slides, so the
-  // tabs load live data the moment they enter. Prime the Watch state so the
-  // tab badge is truthful before the tab is ever opened.
-  useEffect(() => {
-    ensureSession()
-      .then(() => getWatch())
-      .catch(() => {})
-      .finally(() => setSessionReady(true));
-  }, []);
-
-  if (!onboarded) {
-    // Onboarding sets its own status bar style (light on the dark welcome
-    // screen, dark on the paper slides).
-    return <Onboarding onDone={() => setOnboarded(true)} />;
-  }
-
-  if (!sessionReady) {
-    // Only reachable if someone sprints through onboarding faster than the
-    // login round-trip — a paper-coloured beat, never a white flash.
-    return <View style={{ flex: 1, backgroundColor: C.paper }} />;
-  }
+  if (!fontsLoaded) return <View style={{ flex: 1, backgroundColor: C.ink }} />;
 
   return (
-    <NavigationContainer>
-      {/* Immersive full-screen: the device status bar stays hidden in-app. */}
-      <StatusBar hidden />
-      <DemoBadge />
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          headerShown: false,
-          tabBarActiveTintColor: C.royal,
-          tabBarInactiveTintColor: C.faint,
-          tabBarStyle: {
-            backgroundColor: "#fff", borderTopColor: C.line, borderTopWidth: 1,
-            height: 66, paddingBottom: 10, paddingTop: 6,
-          },
-          tabBarLabelStyle: { fontSize: 10.5, fontWeight: "700" },
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon name={route.name} color={color} focused={focused} />
-          ),
-        })}
-      >
-        <Tab.Screen name="Home" component={Home} />
-        <Tab.Screen name="Spending" component={Spending} />
-        <Tab.Screen name="Goals" component={Goals} />
-        <Tab.Screen name="Watch" component={Watch} />
-        <Tab.Screen name="Prices" component={Prices} />
-      </Tab.Navigator>
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <StoreProvider initial={boot.state}>
+        <Root initialScreen={boot.screen} />
+      </StoreProvider>
+    </SafeAreaProvider>
   );
 }

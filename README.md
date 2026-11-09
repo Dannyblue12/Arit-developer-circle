@@ -1,136 +1,93 @@
-# Savi — spend like you *sabi* 📍
+# Wellsent: money well sent.
 
-**AI-powered financial companion for Nigerians.** Savi sorts your spending
-automatically, measures it against proven benchmarks to give you specific
-optimisation suggestions, surfaces real community-verified local prices, turns
-savings into goals you chase, and guards every payment against fraud.
+**Trusted money between Nigerian students and the people who support them.**
+Built for the **Cleva × Tether Future of Payments Hackathon (UNIUYO Edition)**.
 
-Built for the **OPay National Innovation Challenge 2026**.
+Family abroad fund an **Upkeep Vault** in USDT. It unlocks a weekly payday that
+lands straight in the student's **Cleva** account, keeps school fees aside for
+the school's official channel, and only accepts money requests from inside the
+app. **Shield** checks every payment before money leaves.
 
----
+> USDT carries the rules. Cleva is the student's bank.
 
-## Monorepo layout
+![Student screens](docs/wellsent-student-screens.png)
+![Sponsor screens](docs/wellsent-sponsor-screens.png)
 
-```
-savi/
-├── backend/     Node.js + Express + MongoDB REST API
-└── mobile/      React Native (Expo) app
-```
+## What it solves
 
-## Core features
+| Problem | Wellsent |
+|---|---|
+| Allowance arrives as a lump sum, gone by week 2 | Weekly paydays + a daily pace |
+| Naira loses value while money sits | Stays in dollars until the student converts in Cleva |
+| "Mummy, it's me, new number" scams | Verified Asks: requests only come through the app |
+| School-fee fraud | Fees go only to the school's official channel, with a receipt |
+| Emergencies | Emergency pot the student unlocks instantly (sponsor told, not asked) |
+| Lookalike addresses, wrong networks, sub-$10 Cleva deposits | Shield warns before sending |
 
-| Feature | What it does | Where |
-|---|---|---|
-| **Auto-sorting** | Categorises transactions from merchant name → pattern → one-tap user memory. No manual logging, ever. | `backend/src/services/categorise.js` |
-| **AI optimisation engine** | Benchmarks each category against the user's income bracket and produces evidence-backed suggestions ("You: ₦45,700 · bracket: ₦32,500 · 40% over → meal-prep saves ₦14,000"). | `backend/src/services/suggest.js` |
-| **Community prices** | Neighbours share real prices; ranked cheapest-first, confirmations build trust, stale finds fade. Sharers earn ₦50/find. | `backend/src/routes/prices.js` |
-| **Savings goals** | Every saving Savi finds attaches to a goal — progress you can feel, lockable into an OPay pocket. | `backend/src/routes/goals.js` |
-| **Savi Watch** | Rule-based fraud & waste guardian: flagged new payees, silent recurring debits, duplicate charges, overspend pace. *Only warns — never touches money.* | `backend/src/services/watch.js` |
+## How it uses Cleva
 
-## Quick start
+1. Every student signs up on Cleva (code **UNIUYO**) and verifies identity.
+2. The student saves their Cleva USDT deposit address once (TRC20 or ERC20).
+3. Every payday is sent to that address; Cleva converts it 1:1 to USD.
+4. The student changes it to naira, keeps dollars, or uses the Cleva dollar card.
+5. Shield enforces Cleva's deposit rules: never under $10, always the saved network.
 
-### 1. Backend
+Proposed with a Cleva partnership: "Verified by Cleva" identity badges, sponsor
+funding through Cleva's licensed inbound-transfer rails, and Fees Direct via Cleva
+naira payouts.
 
-```bash
-cd backend
-npm install
-cp .env.example .env        # edit if needed
-npm run seed                # creates demo user + a month of data
-npm run dev                 # API on http://localhost:4000
-```
+## The app (`mobile/`)
 
-Demo login: phone `08010000000` · password `savi1234`
-
-Smoke-test:
-```bash
-curl http://localhost:4000/api/health
-curl -X POST http://localhost:4000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"phone":"08010000000","password":"savi1234"}'
-```
-
-### 2. Mobile
+React Native (Expo SDK 51). Brand: indigo `#3538CD`, ink `#10153A`, payday gold
+`#F5B800` (money moments only), Plus Jakarta Sans. Green/orange/red are reserved
+for Shield verdicts.
 
 ```bash
 cd mobile
 npm install
-npm start                   # Expo dev server; press a for Android
+npm start          # Expo Go on your phone
+npm run web        # in a browser
+npm test           # Shield + plan-rule tests
 ```
 
-**Point the app at your API:** automatic. The app derives the API host from
-the Expo dev server it loaded from — scan the QR with Expo Go on a phone on
-the **same wifi** as your machine and it reaches `http://<your-LAN-IP>:4000`
-by itself (Android emulator falls back to `http://10.0.2.2:4000`). To point
-somewhere else, set `EXPO_PUBLIC_API_URL`, e.g.:
+The prototype runs fully on-device with demo data: one phone can play both the
+student and the sponsor (**Me → Demo controls → Switch**), and **Run payday**
+fast-forwards to Monday. On web, `?demo=student` or `?demo=sponsor` opens a plan
+four weeks in, and `&screen=Name` opens a specific screen.
 
-```bash
-EXPO_PUBLIC_API_URL=http://192.168.1.50:4000 npm start
-```
+### Screens
 
-**Sign-in:** the app signs itself into the seeded demo account on launch
-(and registers it first if the backend is fresh), so live data flows with
-zero setup.
+- **Shared:** Welcome · Sign up · Connect Cleva · Pair (invite code) · Shield check
+- **Student:** Home (next payday, daily pace, progress) · Plan invite (5 promises) ·
+  Payday landed · Asks · New ask · Emergency · Pull forward · School fees ·
+  Weekly check-in · Activity · Me
+- **Sponsor:** Home ("Is this really Chidi?") · Create plan (4 steps) · Fund vault ·
+  Asks · Ask detail · Scam check · Plan detail · Me
 
-**Offline-safe demo:** if the API is unreachable, the app automatically falls
-back to bundled demo data (identical to the seeded backend) and shows a small
-"demo data" badge — the pitch never dies with the wifi.
+### Plan rules (`src/state/planMath.js`, tested)
 
-## API surface
+- At most 26 weeks (one semester); the app computes the payday so nothing is stranded.
+- Every payday is at least $10 (Cleva's minimum); small plans switch to fortnightly.
+- Emergency pot (default 15%) unlocks once a month without approval.
+- Pull forward up to 2 paydays a month; later paydays shrink but never below $10.
+- Reductions/cancellation need 2 weeks' notice; leftovers go to the student.
 
-```
-POST /api/auth/register            POST /api/auth/login
-POST /api/auth/link-opay           GET  /api/auth/me
+### Shield (`src/shield/shield.js`, tested)
 
-GET  /api/spending/summary         GET  /api/spending/suggestions
-GET  /api/spending/tidy            POST /api/spending/tidy/:txId
-POST /api/spending/transactions    (ingest + auto-categorise + Watch review)
+Pure rules: invalid address, wrong network, lookalike of a saved address,
+community-reported address, under Cleva's $10 minimum, and a caution for large
+first payments. Changing the payday address needs sponsor confirmation and a
+48-hour wait. Note: address checks are format-only; production should also
+verify address checksums.
 
-GET  /api/goals                    POST /api/goals
-POST /api/goals/:id/contribute
+## Status
 
-GET  /api/prices                   GET  /api/prices/fresh
-POST /api/prices                   POST /api/prices/:id/confirm
+- **Done:** full UI and demo flow for both roles, plan rules, Shield rules, tests.
+- **Simulated in the demo:** the vault contract, real USDT transfers, Cleva
+  deposits, and Fees Direct payment.
+- **Next:** vault smart contract (Tron/Ethereum, the networks Cleva accepts),
+  WDK wallets, a real $10+ USDT deposit into Cleva for the pitch, and a backend
+  for plans/asks so two phones stay in sync.
 
-GET  /api/watch                    POST /api/watch/:id/resolve
-```
-
-## How the AI works (honest version)
-
-1. **Categorisation** needs no ML for v1: merchant-name matching covers most
-   wallet transactions; repeated amount+payee patterns catch rent/suppliers;
-   the user is asked **once** about a plain transfer to a new person and Savi
-   remembers that counterparty forever.
-2. **Suggestions** come from a benchmark engine: the user's per-category spend
-   is compared against income-bracket medians, and a playbook of local,
-   concrete optimisations fires only when the numbers justify it — so every
-   tip ships with its evidence. Benchmarks are seeded for the prototype; in
-   production they're aggregated nightly from anonymised cohort data.
-3. **Savi Watch** is transparent rules (flagged payees, silent debits,
-   duplicates, pace) — auditable, explainable, and honest about being v1.
-   An LLM layer (`LLM_API_KEY`) can refine phrasing later; numbers always
-   come from the engine.
-
-## Roadmap (post-challenge)
-
-- Real OPay OAuth + live transaction webhook (replaces the seed stub)
-- Community fraud-signal network feeding Savi Watch
-- Voice interface in Pidgin/Yoruba/Hausa/Igbo for low-literacy users
-- Auto-fix recurring bills (data bundles first)
-
-## Push to GitHub
-
-```bash
-cd savi
-git init
-git add .
-git commit -m "Savi v1 — API + React Native app"
-git branch -M main
-git remote add origin https://github.com/<your-username>/savi.git
-git push -u origin main
-```
-
-## Team
-
-Built by Team Savi for the OPay National Innovation Challenge 2026.
-
-*All demo figures are illustrative.*
+`backend/` still holds the earlier Savi API (Node/Express/MongoDB) from before
+the pivot; it is not used by the Wellsent app yet.

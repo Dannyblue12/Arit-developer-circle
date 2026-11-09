@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Savi",
-    "slug": "savi",
+    "name": "Wellsent",
+    "slug": "wellsent",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
@@ -9,15 +9,22 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#02352B"
+      "backgroundColor": "#10153A"
     },
     "android": {
-      "package": "com.savi.app",
+      "package": "com.wellsent.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#02352B"
+        "backgroundColor": "#3538CD"
       }
     },
-    "ios": { "supportsTablet": false }
+    "ios": {
+      "supportsTablet": false
+    },
+    "web": {
+      "name": "Wellsent",
+      "backgroundColor": "#FAF9F6"
+    },
+    "plugins": ["expo-font"]
   }
 }
