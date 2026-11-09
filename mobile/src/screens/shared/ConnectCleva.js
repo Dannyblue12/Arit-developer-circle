@@ -4,7 +4,7 @@ import { C } from "../../theme/theme";
 import { Screen, TopBar, Card, T, Button, Chip, Field, ShieldResult, IconChip, Notice } from "../../components/UI";
 import { useStore, DEMO } from "../../state/store";
 import { checkSend, NETWORKS } from "../../shield/shield";
-import SetupSteps, { STUDENT_STEPS } from "../../components/SetupSteps";
+import SetupSteps, { STUDENT_STEPS, SELF_STEPS } from "../../components/SetupSteps";
 import { Asset, Float } from "../../components/Brand";
 
 const STEPS = [
@@ -13,7 +13,8 @@ const STEPS = [
   ["copy", "Copy your USDT deposit address", "In Cleva: Add funds → From stablecoins → USDT (TRC20)."],
 ];
 
-export default function ConnectCleva({ navigation }) {
+export default function ConnectCleva({ navigation, route }) {
+  const self = route.params?.role === "self";
   const { actions } = useStore();
   const [network, setNetwork] = useState("TRC20");
   const [address, setAddress] = useState("");
@@ -23,14 +24,15 @@ export default function ConnectCleva({ navigation }) {
 
   const save = () => {
     actions.connectCleva({ address: address.trim(), network });
-    navigation.navigate("Pair", { role: "student" });
+    if (self) actions.completeSelf(); // no one to invite: straight to your home
+    else navigation.navigate("Pair", { role: "student" });
   };
 
   return (
-    <Screen footer={<Button label="Save my payday address" onPress={save} disabled={!ok} icon="checkmark-circle" />}>
+    <Screen footer={<Button label={self ? "Save and finish" : "Save my payday address"} onPress={save} disabled={!ok} icon="checkmark-circle" />}>
       <TopBar
         onBack={() => navigation.goBack()}
-        top={<SetupSteps steps={STUDENT_STEPS} current={1} />}
+        top={<SetupSteps steps={self ? SELF_STEPS : STUDENT_STEPS} current={1} />}
         title="Connect your Cleva account"
       />
       <Card gradient="indigo" style={{ flexDirection: "row", alignItems: "center", paddingVertical: 10, overflow: "hidden" }}>

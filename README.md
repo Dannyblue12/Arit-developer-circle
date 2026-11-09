@@ -1,18 +1,34 @@
 # Wellsent: money well sent.
 
-**Trusted money between Nigerian students and the people who support them.**
+**Money that lasts and arrives safely, for students and families supported from
+abroad, and for freelancers paying themselves a salary.**
 Built for the **Cleva × Tether Future of Payments Hackathon (UNIUYO Edition)**.
 
-Family abroad fund an **Upkeep Vault** in USDT. It unlocks a weekly payday that
-lands straight in the student's **Cleva** account, keeps school fees aside for
+Someone funds an **Upkeep Vault** in USDT: a family member abroad for a student
+or relative, or a freelancer for themselves. It unlocks a weekly payday that
+lands straight in the person's **Cleva** account, keeps school fees aside for
 the school's official channel, and only accepts money requests from inside the
 app. **Shield** checks every payment before money leaves.
+
+## Who it's for
+
+| Who | What they do with Wellsent | In the prototype |
+|---|---|---|
+| Students supported by family | Weekly paydays, fees paid to the school, asks only in the app | Yes (the main demo) |
+| Families supporting anyone at home | The same plans for siblings, parents, apprentices | Same app |
+| Freelancers and remote workers | Lock a client payment, get a weekly salary in Cleva, add income any time | Yes ("I want to pay myself") |
+| Organisations | Stipends that arrive on time and can be checked | Next |
+
+Students come first because the pain is sharpest. Freelancer plans work with
+income received in USDT; money already in a Cleva USD balance can't be sent
+back out as USDT.
 
 > USDT carries the rules. Cleva is the student's bank.
 
 ![Onboarding](docs/wellsent-onboarding.png)
 ![Student screens](docs/wellsent-student-screens.png)
 ![Sponsor screens](docs/wellsent-sponsor-screens.png)
+![Freelancer screens](docs/wellsent-freelancer-screens.png)
 
 ## What it solves
 
@@ -58,10 +74,11 @@ npm run web        # in a browser
 npm test           # Shield + plan-rule tests
 ```
 
-The prototype runs fully on-device with demo data: one phone can play both the
-student and the sponsor (**Me → Demo controls → Switch**), and **Run payday**
-fast-forwards to Monday. On web, `?demo=student` or `?demo=sponsor` opens a plan
-four weeks in, and `&screen=Name` opens a specific screen.
+The prototype runs fully on-device with demo data: one phone can play the
+student, the sponsor or a freelancer (**Me → Demo controls**), and **Run payday**
+fast-forwards to Monday. On web, `?demo=student`, `?demo=sponsor` or
+`?demo=self` opens a plan already under way, and `&screen=Name` opens a
+specific screen.
 
 ### Screens
 
@@ -71,6 +88,8 @@ four weeks in, and `&screen=Name` opens a specific screen.
 - **Student:** Home (next payday, daily pace, progress) · Plan invite (5 promises) ·
   Payday landed · Asks · New ask · Emergency · Pull forward · School fees ·
   Weekly check-in · Activity · Me
+- **Freelancer ("pay myself"):** Home (next payday, "Got paid? Add it") ·
+  Create salary plan (3 steps) · Fund vault · Add income · Emergency · Pull forward · Me
 - **Sponsor:** Home ("Is this really Chidi?") · Create plan (4 steps) · Fund vault ·
   Asks · Ask detail · Scam check · Plan detail · Me
 
@@ -92,7 +111,8 @@ verify address checksums.
 
 ## Status
 
-- **Done:** full UI and demo flow for both roles, plan rules, Shield rules, tests.
+- **Done:** full UI and demo flows for students, sponsors and freelancers, plan
+  rules, Shield rules, tests.
 - **Simulated in the demo:** the vault contract, real USDT transfers, Cleva
   deposits, and Fees Direct payment.
 - **Next:** vault smart contract (Tron/Ethereum, the networks Cleva accepts),

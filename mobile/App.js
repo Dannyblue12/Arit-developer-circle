@@ -44,6 +44,10 @@ import ScamCheck from "./src/screens/sponsor/ScamCheck";
 import PlanDetail from "./src/screens/sponsor/PlanDetail";
 import SponsorMe from "./src/screens/sponsor/SponsorMe";
 
+import SelfHome from "./src/screens/self/SelfHome";
+import TopUp from "./src/screens/self/TopUp";
+import SelfMe from "./src/screens/self/SelfMe";
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -76,6 +80,16 @@ function StudentTabs() {
       <Tab.Screen name="Asks" component={StudentAsks} options={{ tabBarBadge: waiting || undefined }} />
       <Tab.Screen name="Activity" component={Activity} />
       <Tab.Screen name="Me" component={StudentMe} />
+    </Tab.Navigator>
+  );
+}
+
+function SelfTabs() {
+  return (
+    <Tab.Navigator screenOptions={tabOptions}>
+      <Tab.Screen name="Home" component={SelfHome} />
+      <Tab.Screen name="Activity" component={Activity} />
+      <Tab.Screen name="Me" component={SelfMe} />
     </Tab.Navigator>
   );
 }
@@ -126,6 +140,17 @@ function Root({ initialScreen }) {
             <Stack.Screen name="PullForward" component={PullForward} />
             <Stack.Screen name="Fees" component={Fees} />
             <Stack.Screen name="CheckIn" component={CheckIn} />
+            <Stack.Screen name="ShieldCheck" component={ShieldCheck} />
+          </>
+        ) : group === "self" ? (
+          <>
+            <Stack.Screen name="SelfTabs" component={SelfTabs} />
+            <Stack.Screen name="CreatePlan" component={CreatePlan} />
+            <Stack.Screen name="FundVault" component={FundVault} />
+            <Stack.Screen name="TopUp" component={TopUp} />
+            <Stack.Screen name="PaydayLanded" component={PaydayLanded} options={{ animation: "fade" }} />
+            <Stack.Screen name="Emergency" component={Emergency} />
+            <Stack.Screen name="PullForward" component={PullForward} />
             <Stack.Screen name="ShieldCheck" component={ShieldCheck} />
           </>
         ) : (

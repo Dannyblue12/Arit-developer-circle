@@ -30,11 +30,13 @@ function PseudoQR({ seed, size = 132 }) {
 export default function FundVault({ navigation }) {
   const { state, actions } = useStore();
   const p = state.plan;
+  const self = state.role === "self";
   const kid = state.student.first;
+  const owner = self ? "Your" : `${kid}'s`;
   const [network, setNetwork] = useState("TRC20");
   const [funded, setFunded] = useState(false);
   const vault = network === "TRC20" ? DEMO.vault : "0x5aE1b2C3d4E5f6A7b8C9d0E1f2A3b4C5d6E7f8A9";
-  const contacts = [{ label: `${kid}'s Wellsent vault`, address: vault, network }];
+  const contacts = [{ label: `${owner} Wellsent vault`, address: vault, network }];
   const result = useMemo(() => checkSend({ address: vault, network, amount: p?.vaultTotal, contacts }), [vault, network, p?.vaultTotal]);
   if (!p) return null;
 
@@ -48,7 +50,9 @@ export default function FundVault({ navigation }) {
           </View>
           <T w="heavy" size={24} style={{ marginTop: 18 }}>Vault funded</T>
           <T size={14} color={C.muted} style={{ marginTop: 6, textAlign: "center", lineHeight: 20 }}>
-            {usd(p.vaultTotal)} is locked by the plan's rules. {kid} has been asked to review and accept. Nothing is released until they do.
+            {self
+              ? `${usd(p.vaultTotal)} is locked by your plan's rules. Your first payday lands in Cleva on Monday.`
+              : `${usd(p.vaultTotal)} is locked by the plan's rules. ${kid} has been asked to review and accept. Nothing is released until they do.`}
           </T>
         </View>
       </Screen>
@@ -57,7 +61,7 @@ export default function FundVault({ navigation }) {
 
   return (
     <Screen footer={<Button label={`Pay ${usd(p.vaultTotal)} from my wallet`} icon="wallet" onPress={() => { actions.fundVault(); haptic.success(); setFunded(true); }} disabled={result.level !== "safe"} />}>
-      <TopBar onBack={() => navigation.goBack()} title={`Fund ${kid}'s vault`} sub="Send USDT from your own wallet. Only the plan's rules can release it." />
+      <TopBar onBack={() => navigation.goBack()} title={self ? "Fund your vault" : `Fund ${kid}'s vault`} sub={self ? "Send the USDT you were paid, from your wallet or exchange. Only your plan's rules can release it." : "Send USDT from your own wallet. Only the plan's rules can release it."} />
 
       <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
         {Object.values(NETWORKS).map((n) => (
@@ -67,7 +71,7 @@ export default function FundVault({ navigation }) {
 
       <Card gradient="indigo" style={{ flexDirection: "row", alignItems: "center", overflow: "hidden", paddingVertical: 12 }}>
         <View style={{ flex: 1 }}>
-          <T w="bold" size={12} color={C.gold} style={{ letterSpacing: 1 }}>{kid.toUpperCase()}'S VAULT</T>
+          <T w="bold" size={12} color={C.gold} style={{ letterSpacing: 1 }}>{owner.toUpperCase()} VAULT</T>
           <T w="heavy" size={30} color="#fff" style={{ letterSpacing: -0.6 }}>{usd(p.vaultTotal)} <T w="bold" size={15} color="#C9CCF5">USDT</T></T>
           <T size={12.5} color="#DADCFF">Released only by the plan's rules</T>
         </View>
@@ -80,7 +84,7 @@ export default function FundVault({ navigation }) {
           <PseudoQR seed={vault} />
         </View>
         <T w="semi" size={13} color={C.muted} style={{ marginTop: 12 }}>{shortAddr(vault)}</T>
-        <Pill text={`${kid}'s vault · ${NETWORKS[network].label}`} tone="indigo" icon="lock-closed" style={{ marginTop: 8 }} />
+        <Pill text={`${owner} vault · ${NETWORKS[network].label}`} tone="indigo" icon="lock-closed" style={{ marginTop: 8 }} />
       </Card>
 
       <ShieldResult result={result} />

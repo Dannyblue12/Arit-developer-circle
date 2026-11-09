@@ -5,7 +5,8 @@ import { C } from "../theme/theme";
 import { T } from "./UI";
 
 export const STUDENT_STEPS = ["Account", "Cleva", "Invite"];
-export const SPONSOR_STEPS = ["Account", "Your student"];
+export const SPONSOR_STEPS = ["Account", "Who you support"];
+export const SELF_STEPS = ["Account", "Cleva"];
 
 // "Step 2 of 3" with named steps, so people always know how much is left.
 export default function SetupSteps({ steps, current }) {

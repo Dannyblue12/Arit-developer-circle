@@ -19,6 +19,8 @@ export const DEMO = {
 const STUDENT = { name: "Chidi Okon", first: "Chidi", school: "University of Uyo · 300L", phone: "+234 801 000 0000" };
 const SPONSOR = { name: "Aunty Ini", first: "Aunty Ini", city: "Houston, USA", phone: "+1 713 555 0142" };
 const BACKUP = { name: "Uncle Ekene", city: "Lagos" };
+// The third kind of user: someone paying themselves from their own income.
+const SELF = { name: "Ada Nwosu", first: "Ada", work: "Freelance product designer", phone: "+234 802 000 0000" };
 
 let seq = 100;
 const id = (p) => `${p}${++seq}`;
@@ -73,6 +75,7 @@ function freshState(role = null) {
     onboarded: false,
     student: STUDENT,
     sponsor: SPONSOR,
+    self: SELF,
     cleva: null, // { address, network }
     paired: false,
     plan: null,
@@ -126,6 +129,36 @@ export function seededState(role) {
   };
 }
 
+// A freelancer three weeks into paying themselves from a $600 client payment.
+export function seededSelfState() {
+  const plan = buildPlan({ total: 600, weeks: 12, emergencyPct: 10 }, "active");
+  plan.backup = null;
+  const lastMonday = nextMonday().getTime() - 7 * DAY;
+  const activity = [];
+  for (let i = 3; i >= 1; i--) {
+    const amt = nextPayout(plan);
+    plan.allowanceLeft = Math.round((plan.allowanceLeft - amt) * 100) / 100;
+    plan.payoutsLeft -= 1;
+    plan.paydaysDone += 1;
+    activity.unshift({ id: id("a"), type: "payday", amount: amt, title: "Payday landed in Cleva", at: new Date(lastMonday - (i - 1) * 7 * DAY).toISOString(), tx: fakeTx() });
+  }
+  plan.week = 4;
+  activity.push(
+    { id: id("a"), type: "accepted", title: "Salary plan started", at: new Date(lastMonday - 15 * DAY).toISOString() },
+    { id: id("a"), type: "funded", amount: 600, title: "Client payment locked in vault", at: new Date(lastMonday - 16 * DAY).toISOString(), tx: fakeTx() }
+  );
+  activity.sort((x, y) => new Date(y.at) - new Date(x.at));
+  const last = activity.find((x) => x.type === "payday");
+  return {
+    ...freshState("self"),
+    onboarded: true,
+    cleva: { address: DEMO.clevaAddress, network: "TRC20" },
+    plan,
+    activity,
+    lastPayday: { amount: last.amount, at: last.at },
+  };
+}
+
 function reducer(state, a) {
   switch (a.type) {
     case "reset":
@@ -141,8 +174,11 @@ function reducer(state, a) {
           name: a.name || state[a.role].name,
           first: a.first || (a.name ? a.name.split(" ")[0] : state[a.role].first),
           phone: a.phone || state[a.role].phone,
+          ...(a.work ? { work: a.work } : {}),
         },
       };
+    case "completeSelf":
+      return { ...state, onboarded: true, cleva: state.cleva || { address: DEMO.clevaAddress, network: "TRC20" } };
     case "connectCleva":
       return { ...state, cleva: { address: a.address, network: a.network } };
     case "pair":
@@ -154,12 +190,34 @@ function reducer(state, a) {
       };
     case "createPlan":
       return { ...state, plan: buildPlan(a.input, "awaiting_funding") };
-    case "fundVault":
+    case "fundVault": {
+      const now = new Date().toISOString();
+      const funded = { id: id("a"), type: "funded", amount: state.plan.vaultTotal, title: "Vault funded", at: now, tx: fakeTx() };
+      // Paying yourself needs no one's acceptance: the plan starts at once.
+      if (state.role === "self") {
+        return {
+          ...state,
+          plan: { ...state.plan, status: "active", nextPaydayAt: nextMonday().toISOString() },
+          activity: [{ id: id("a"), type: "accepted", title: "Salary plan started", at: now }, funded, ...state.activity],
+        };
+      }
+      return { ...state, plan: { ...state.plan, status: "invited" }, activity: [funded, ...state.activity] };
+    }
+    case "topUp": {
+      // New income joins the vault and is spread over the paydays left.
+      const p = state.plan;
+      if (!p || !(a.amount > 0)) return state;
       return {
         ...state,
-        plan: { ...state.plan, status: "invited" },
-        activity: [{ id: id("a"), type: "funded", amount: state.plan.vaultTotal, title: "Vault funded", at: new Date().toISOString(), tx: fakeTx() }, ...state.activity],
+        plan: {
+          ...p,
+          allowanceLeft: Math.round((p.allowanceLeft + a.amount) * 100) / 100,
+          total: Math.round((p.total + a.amount) * 100) / 100,
+          vaultTotal: Math.round((p.vaultTotal + a.amount) * 100) / 100,
+        },
+        activity: [{ id: id("a"), type: "funded", amount: a.amount, title: `Added to vault: ${a.source || "income"}`, at: new Date().toISOString(), tx: fakeTx() }, ...state.activity],
       };
+    }
     case "acceptPlan":
       return {
         ...state,
@@ -255,6 +313,11 @@ export function bootFromUrl() {
   const q = new URLSearchParams(window.location.search);
   const demo = q.get("demo");
   const screen = q.get("screen") || undefined;
+  if (demo === "self") {
+    const s = seededSelfState();
+    if (q.get("plan") === "none") s.plan = null;
+    return { state: s, screen };
+  }
   if (demo === "student" || demo === "sponsor") {
     const s = seededState(demo);
     if (q.get("plan") === "invited") s.plan = { ...s.plan, status: "invited" };
@@ -271,7 +334,9 @@ export function StoreProvider({ initial, children }) {
   const [state, dispatch] = useReducer(reducer, initial || freshState());
   const actions = useMemo(
     () => ({
-      reset: (role) => dispatch({ type: "reset", state: role ? seededState(role) : freshState() }),
+      reset: (role) => dispatch({ type: "reset", state: role === "self" ? seededSelfState() : role ? seededState(role) : freshState() }),
+      completeSelf: () => dispatch({ type: "completeSelf" }),
+      topUp: (p) => dispatch({ type: "topUp", ...p }),
       setRole: (role) => dispatch({ type: "setRole", role }),
       signUp: (p) => dispatch({ type: "signUp", ...p }),
       connectCleva: (p) => dispatch({ type: "connectCleva", ...p }),

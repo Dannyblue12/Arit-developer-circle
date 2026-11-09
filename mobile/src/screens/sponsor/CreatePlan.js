@@ -7,12 +7,13 @@ import { useStore } from "../../state/store";
 import { computePlan, MAX_WEEKS } from "../../state/planMath";
 
 const STEPS = ["Amount", "Pots & rules", "Backup", "Review"];
+const SELF_STEPS = ["Amount", "Pots & rules", "Review"];
 
-function Steps({ step }) {
+function Steps({ step, steps }) {
   return (
     <View style={{ flexDirection: "row", marginBottom: 18 }}>
-      {STEPS.map((s, i) => (
-        <View key={s} style={{ flex: 1, marginRight: i < STEPS.length - 1 ? 6 : 0 }}>
+      {steps.map((s, i) => (
+        <View key={s} style={{ flex: 1, marginRight: i < steps.length - 1 ? 6 : 0 }}>
           <View style={{ height: 4, borderRadius: 2, backgroundColor: i <= step ? C.indigo : C.indigoTint }} />
           <T w={i === step ? "bold" : "medium"} size={11} color={i <= step ? C.indigo : C.faint} style={{ marginTop: 6 }}>{s}</T>
         </View>
@@ -23,12 +24,16 @@ function Steps({ step }) {
 
 export default function CreatePlan({ navigation }) {
   const { state, actions } = useStore();
+  const self = state.role === "self";
   const kid = state.student.first;
+  const steps = self ? SELF_STEPS : STEPS;
   const [step, setStep] = useState(0);
+  // Which panel to show: self plans skip the backup approver.
+  const panel = steps[step];
   const [total, setTotal] = useState("300");
   const [weeks, setWeeks] = useState(12);
   const [emergencyPct, setEmergencyPct] = useState(15);
-  const [feesOn, setFeesOn] = useState(true);
+  const [feesOn, setFeesOn] = useState(!self);
   const [fees, setFees] = useState("100");
   const [feesUnused, setFeesUnused] = useState("sponsor");
   const [allowPullForward, setAllowPullForward] = useState(true);
@@ -44,13 +49,13 @@ export default function CreatePlan({ navigation }) {
   const finish = () => {
     actions.createPlan({
       total: Number(total), weeks, emergencyPct, fees: feesOn ? Number(fees) || 0 : 0,
-      feesUnused, allowPullForward, backup: { name: backupName, city: backupCity },
+      feesUnused, allowPullForward, backup: self ? null : { name: backupName, city: backupCity },
     });
     navigation.replace("FundVault");
   };
 
   const footer =
-    step < 3 ? (
+    step < steps.length - 1 ? (
       <Button label="Continue" onPress={() => setStep(step + 1)} disabled={step === 0 && !plan.ok} />
     ) : (
       <Button label={`Create plan & fund ${usd(plan.vaultTotal)}`} icon="lock-closed" onPress={finish} disabled={!plan.ok} />
@@ -58,18 +63,25 @@ export default function CreatePlan({ navigation }) {
 
   return (
     <Screen footer={footer}>
-      <TopBar onBack={() => (step ? setStep(step - 1) : navigation.goBack())} title={`${kid}'s plan`} />
-      <Steps step={step} />
+      <TopBar onBack={() => (step ? setStep(step - 1) : navigation.goBack())} title={self ? "Your salary plan" : `${kid}'s plan`} />
+      <Steps step={step} steps={steps} />
 
-      {step === 0 ? (
+      {panel === "Amount" ? (
         <>
-          <Field label={`How much for ${kid}'s upkeep?`} prefix="$" value={total} onChangeText={setTotal} keyboardType="decimal-pad" hint="Includes the emergency pot. School fees come next." />
+          <Field
+            label={self ? "How much do you want to turn into a salary?" : `How much for ${kid}'s upkeep?`}
+            prefix="$"
+            value={total}
+            onChangeText={setTotal}
+            keyboardType="decimal-pad"
+            hint={self ? "For example, a client payment. You can add more income any time." : "Includes the emergency pot. School fees come next."}
+          />
           <T w="semi" size={13} color={C.muted} style={{ marginBottom: 6 }}>For how long? (max {MAX_WEEKS} weeks, one semester)</T>
           <Stepper value={weeks} onChange={setWeeks} max={MAX_WEEKS} suffix="weeks" />
           <View style={{ height: 14 }} />
           {plan.ok ? (
             <Card gradient="indigo" style={{ padding: 18 }}>
-              <T w="semi" size={13} color="#C9CCF5">{kid} gets</T>
+              <T w="semi" size={13} color="#C9CCF5">{self ? "You get" : `${kid} gets`}</T>
               <T w="heavy" size={34} color="#fff" style={{ letterSpacing: -0.8 }}>{usd(plan.perPayout)}</T>
               <T w="semi" size={14} color="#fff">{cadence} · ≈ {naira(toNaira(plan.perPayout))}</T>
               <T size={12} color="#C9CCF5" style={{ marginTop: 8 }}>
@@ -82,11 +94,11 @@ export default function CreatePlan({ navigation }) {
         </>
       ) : null}
 
-      {step === 1 ? (
+      {panel === "Pots & rules" ? (
         <>
           <T w="bold" size={15}>Emergency pot</T>
           <T size={12.5} color={C.muted} style={{ marginTop: 2, marginBottom: 10 }}>
-            {kid} can unlock it instantly, once a month, without asking. You're told, not asked.
+            {self ? "Your safety net. Unlock it instantly, once a month, for surprises." : `${kid} can unlock it instantly, once a month, without asking. You're told, not asked.`}
           </T>
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             {[10, 15, 20, 25].map((v) => (
@@ -95,9 +107,11 @@ export default function CreatePlan({ navigation }) {
           </View>
           <Card style={{ paddingVertical: 2, marginTop: 8 }}>
             <Toggle label="Allow pulling paydays forward" sub="Up to 2 a month. Later paydays shrink to match. Never below $10." value={allowPullForward} onValueChange={setAllowPullForward} />
-            <Toggle label="Reserve money for school fees" sub="Paid only to the school's official channel." value={feesOn} onValueChange={setFeesOn} />
+            {!self ? (
+              <Toggle label="Reserve money for school fees" sub="Paid only to the school's official channel." value={feesOn} onValueChange={setFeesOn} />
+            ) : null}
           </Card>
-          {feesOn ? (
+          {feesOn && !self ? (
             <>
               <Field label="Fees amount" prefix="$" value={fees} onChangeText={setFees} keyboardType="decimal-pad" hint="For University of Uyo · deadline 15 Dec" />
               <T w="semi" size={13} color={C.muted} style={{ marginBottom: 8 }}>If fees aren't used by the deadline, the money goes</T>
@@ -111,7 +125,7 @@ export default function CreatePlan({ navigation }) {
         </>
       ) : null}
 
-      {step === 2 ? (
+      {panel === "Backup" ? (
         <>
           <Notice icon="moon">
             If you don't answer one of {kid}'s asks within 6 hours, your backup can approve it. Houston is 7 hours behind Uyo in winter.
@@ -122,16 +136,20 @@ export default function CreatePlan({ navigation }) {
         </>
       ) : null}
 
-      {step === 3 ? (
+      {panel === "Review" ? (
         <>
           <Card style={{ paddingVertical: 4 }}>
-            <ListItem icon="calendar" title={`${usd(plan.perPayout)} ${cadence}`} subtitle={`${plan.payouts} paydays over ${plan.weeks} weeks · into ${kid}'s Cleva account`} />
-            <ListItem icon="medkit" title={`${usd(plan.emergencyPot)} emergency pot`} subtitle="Once a month, no approval. Unused money goes to the student at the end." />
+            <ListItem icon="calendar" title={`${usd(plan.perPayout)} ${cadence}`} subtitle={`${plan.payouts} paydays over ${plan.weeks} weeks · into ${self ? "your" : `${kid}'s`} Cleva account`} />
+            <ListItem icon="medkit" title={`${usd(plan.emergencyPot)} emergency pot`} subtitle={self ? "Once a month, instantly. Anything unused is paid out at the end." : "Once a month, no approval. Unused money goes to the student at the end."} />
             {plan.fees ? <ListItem icon="school" title={`${usd(plan.fees)} school fees`} subtitle={`University of Uyo only · unused → ${feesUnused === "sponsor" ? "back to you" : kid}`} /> : null}
-            <ListItem icon="people" title={`Backup: ${backupName}`} subtitle={backupCity} />
+            {!self ? <ListItem icon="people" title={`Backup: ${backupName}`} subtitle={backupCity} /> : null}
             <ListItem icon="lock-closed" title={`Total to fund: ${usd(plan.vaultTotal)}`} subtitle="Held by the vault's rules, not by Wellsent" last />
           </Card>
-          <Promises title={`${kid}'s 5 promises`} />
+          {self ? (
+            <Notice icon="time">Changed your mind? You can unlock everything early, after a 48-hour wait. The wait is what stops impulse spending.</Notice>
+          ) : (
+            <Promises title={`${kid}'s 5 promises`} />
+          )}
         </>
       ) : null}
     </Screen>

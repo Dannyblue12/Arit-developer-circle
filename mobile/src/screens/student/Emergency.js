@@ -14,6 +14,7 @@ export default function Emergency({ navigation }) {
   const { state, actions } = useStore();
   const p = state.plan;
   const sponsor = state.sponsor.first;
+  const self = state.role === "self";
   const left = p?.emergencyLeft || 0;
   const options = [10, 20, 30].filter((v) => v < left).concat(left >= 10 ? [left] : []);
   const [reason, setReason] = useState("Health");
@@ -37,7 +38,9 @@ export default function Emergency({ navigation }) {
           <T w="heavy" size={24} style={{ marginTop: 18, textAlign: "center" }}>{usd(done.amount)} is on its way to Cleva</T>
           <T size={14} color={C.muted} style={{ marginTop: 6 }}>≈ {naira(toNaira(done.amount))} · usually within minutes</T>
           <Notice icon="notifications" style={{ marginTop: 22 }}>
-            {sponsor} has been told: “{state.student.first} used {usd(done.amount)} emergency money for {done.reason.toLowerCase()}.” They weren't asked. It's your pot.
+            {self
+              ? "Logged in your activity. Your regular paydays stay the same."
+              : `${sponsor} has been told: “${state.student.first} used ${usd(done.amount)} emergency money for ${done.reason.toLowerCase()}.” They weren't asked. It's your pot.`}
           </Notice>
           <T w="semi" size={14} color={C.ink} style={{ marginTop: 8 }}>Take care of yourself. 💛</T>
         </View>
@@ -71,7 +74,7 @@ export default function Emergency({ navigation }) {
         ))}
       </View>
       <Notice icon="notifications" style={{ marginTop: 10 }}>
-        {sponsor} will be told, not asked. Anything you don't use comes to you at the end of the plan.
+        {self ? "Your safety net, no questions asked." : `${sponsor} will be told, not asked.`} Anything you don't use comes to you at the end of the plan.
       </Notice>
     </Screen>
   );

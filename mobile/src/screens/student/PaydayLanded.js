@@ -66,7 +66,7 @@ export default function PaydayLanded({ navigation }) {
             It's in your Cleva account · ≈ {naira(toNaira(last.amount))}
           </T>
           <T size={12.5} color="#8E93CF" style={{ marginTop: 4 }}>
-            {fmtDay(last.at)} · {state.cleva?.network} · from {state.sponsor.first}
+            {fmtDay(last.at)} · {state.cleva?.network} · {state.role === "self" ? "from your vault" : `from ${state.sponsor.first}`}
           </T>
         </Animated.View>
       </View>

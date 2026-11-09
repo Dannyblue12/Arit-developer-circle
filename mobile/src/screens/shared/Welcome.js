@@ -115,7 +115,7 @@ function WalletArt() {
 
 const PAGES = [
   { key: "hero", Art: HeroArt },
-  { key: "payday", Art: PaydayArt, eyebrow: "MONEY THAT LASTS", title: "A payday every Monday", body: "Family abroad set up a plan once. A fixed amount unlocks every week, so the money lasts the whole semester." },
+  { key: "payday", Art: PaydayArt, eyebrow: "MONEY THAT LASTS", title: "A payday every Monday", body: "Set up a plan once, from family abroad or from your own income. A fixed amount unlocks every week, so money lasts all month." },
   { key: "shield", Art: ShieldArt, eyebrow: "SAFE FROM SCAMS", title: "Only real requests get through", body: "Requests come only from your verified account, and Shield checks every payment before it leaves." },
   { key: "wallet", Art: WalletArt, eyebrow: "STRAIGHT INTO CLEVA", title: "Lands in your Cleva wallet", body: "Change it to naira, keep dollars, or pay online with your Cleva card. Your money, your choice." },
   { key: "choose" },
@@ -196,21 +196,19 @@ export default function Welcome({ navigation }) {
                     Money well sent<T w="heavy" size={42} color={C.gold}>.</T>
                   </T>
                   <T size={16} color="#C9CCF5" style={{ marginTop: 10, lineHeight: 24 }}>
-                    The safe way for family abroad to support a student at home. Weekly paydays, straight into Cleva.
+                    Weekly paydays, straight into Cleva. For students and families supported from abroad, and for freelancers paying themselves a salary.
                   </T>
                   <T w="semi" size={14} color={C.gold} style={{ marginTop: 14 }}>Send am. Sleep well.</T>
                 </Animated.View>
               ) : p.key === "choose" ? (
                 <Animated.View style={{ opacity: fade }}>
-                  <View style={{ alignItems: "center", marginBottom: 6 }}>
-                    <Float amplitude={6}><Asset name="coin" size={96} /></Float>
-                  </View>
                   <T w="heavy" size={30} color="#fff" style={{ letterSpacing: -0.8, textAlign: "center" }}>How will you use Wellsent?</T>
-                  <T size={14.5} color="#C9CCF5" style={{ textAlign: "center", marginTop: 8, marginBottom: 10 }}>
-                    Students and supporters each get their own simple app.
+                  <T size={14.5} color="#C9CCF5" style={{ textAlign: "center", marginTop: 8, marginBottom: 6 }}>
+                    Pick one. Each gets its own simple app.
                   </T>
-                  <RoleCard primary asset="wallet" title="I'm a student" sub="Get weekly paydays from family" onPress={() => navigation.navigate("SignUp", { role: "student" })} />
-                  <RoleCard asset="vault" title="I support a student" sub="Send money that lasts the month" onPress={() => navigation.navigate("SignUp", { role: "sponsor" })} />
+                  <RoleCard primary asset="wallet" title="I get support from family" sub="Students, siblings, parents at home" onPress={() => navigation.navigate("SignUp", { role: "student" })} />
+                  <RoleCard asset="vault" title="I support someone at home" sub="Send money that lasts the month" onPress={() => navigation.navigate("SignUp", { role: "sponsor" })} />
+                  <RoleCard asset="coin" title="I want to pay myself" sub="Freelancers and earners: a weekly salary" onPress={() => navigation.navigate("SignUp", { role: "self" })} />
                 </Animated.View>
               ) : (
                 <Animated.View style={{ opacity: fade }}>
