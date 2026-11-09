@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { C } from "../../theme/theme";
 import { Screen, TopBar, Field, Button, Notice, T } from "../../components/UI";
 import { useStore } from "../../state/store";
+import SetupSteps, { STUDENT_STEPS, SPONSOR_STEPS } from "../../components/SetupSteps";
 
 export default function SignUp({ navigation, route }) {
   const role = route.params?.role || "student";
@@ -35,6 +36,7 @@ export default function SignUp({ navigation, route }) {
       <StatusBar style="dark" />
       <TopBar
         onBack={() => navigation.goBack()}
+        top={<SetupSteps steps={student ? STUDENT_STEPS : SPONSOR_STEPS} current={0} />}
         title="Create your account"
         sub={student ? "Your family will see this name when you ask for money." : "Your student will see this name on their plan."}
       />

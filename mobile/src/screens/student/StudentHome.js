@@ -6,6 +6,8 @@ import { C, usd, naira, toNaira, shortAddr, initials } from "../../theme/theme";
 import { Screen, Card, T, Pill, IconChip, ProgressBar, Button, ListItem, Entrance, SectionLabel, pressFx } from "../../components/UI";
 import { useStore, fmtDay, canUseEmergency, canPullForward } from "../../state/store";
 import { nextPayout } from "../../state/planMath";
+import { Asset, Float } from "../../components/Brand";
+import GettingStarted from "../../components/GettingStarted";
 
 const greeting = () => {
   const h = new Date().getHours();
@@ -29,17 +31,6 @@ function Action({ icon, label, sub, onPress, disabled }) {
   );
 }
 
-function Waiting({ icon, title, sub, children }) {
-  return (
-    <Card tone="tint" style={{ alignItems: "center", paddingVertical: 28 }}>
-      <IconChip icon={icon} size={52} />
-      <T w="heavy" size={17} style={{ marginTop: 12, textAlign: "center" }}>{title}</T>
-      <T size={13} color={C.muted} style={{ marginTop: 6, textAlign: "center", lineHeight: 19 }}>{sub}</T>
-      {children}
-    </Card>
-  );
-}
-
 export default function StudentHome({ navigation }) {
   const { state, actions } = useStore();
   const p = state.plan;
@@ -60,26 +51,36 @@ export default function StudentHome({ navigation }) {
         </View>
       </View>
 
-      {!p ? (
-        <Waiting icon="hourglass" title={`Waiting for ${sponsor} to set up your plan`} sub="You'll review and accept it before anything starts." />
-      ) : p.status === "awaiting_funding" ? (
-        <Waiting icon="hourglass" title={`${sponsor} is funding your vault`} sub="You'll get the plan to review in a moment." />
-      ) : p.status === "invited" ? (
+      {!p || p.status === "awaiting_funding" || p.status === "invited" ? (
         <Entrance>
-          <Card tone="gold" style={{ paddingVertical: 20 }}>
-            <Pill text="NEW PLAN" tone="gold" icon="sparkles" />
-            <T w="heavy" size={20} style={{ marginTop: 10 }}>{sponsor} sent you a plan</T>
-            <T size={14} color={C.ink} style={{ marginTop: 4 }}>
-              {usd(p.total)} over {p.weeks} weeks · {usd(p.perPayout)} every {p.everyWeeks === 1 ? "Monday" : "2 weeks"}
-            </T>
-            <Button label="Review plan" onPress={() => navigation.navigate("PlanInvite")} style={{ marginTop: 14 }} />
-          </Card>
+          <GettingStarted
+            title={p?.status === "invited" ? `${sponsor} sent you a plan` : `Waiting for ${sponsor}`}
+            sub={
+              p?.status === "invited"
+                ? `${usd(p.total)} over ${p.weeks} weeks · ${usd(p.perPayout)} every ${p.everyWeeks === 1 ? "Monday" : "2 weeks"}. Review it and accept.`
+                : "You'll review and accept the plan before anything starts."
+            }
+            steps={[
+              ["Account created", true],
+              ["Cleva payday address saved", !!state.cleva],
+              [`${sponsor} joined`, state.paired],
+              [`${sponsor} sets up and funds your plan`, p?.status === "invited"],
+              ["You accept the plan", false],
+              ["First payday lands on Monday", false],
+            ]}
+          >
+            {p?.status === "invited" ? (
+              <Button label="Review plan" variant="gold" icon="document-text" onPress={() => navigation.navigate("PlanInvite")} style={{ marginTop: 18 }} />
+            ) : null}
+          </GettingStarted>
         </Entrance>
       ) : (
         <>
           <Entrance>
-            <Card tone="indigo" style={{ padding: 20, overflow: "hidden" }}>
-              <View style={{ position: "absolute", right: -30, top: -30, width: 130, height: 130, borderRadius: 65, backgroundColor: "rgba(245,184,0,0.16)" }} />
+            <Card gradient="indigo" style={{ padding: 20, overflow: "hidden" }}>
+              <Float amplitude={7} rotate={6} style={{ position: "absolute", right: -6, top: -2 }}>
+                <Asset name="coin" size={108} />
+              </Float>
               <Pill text={p.status === "ended" ? "PLAN COMPLETE" : "NEXT PAYDAY"} tone="onDark" />
               {p.status === "ended" ? (
                 <T w="heavy" size={26} color="#fff" style={{ marginTop: 12 }}>All {usd(p.total)} delivered 🎉</T>

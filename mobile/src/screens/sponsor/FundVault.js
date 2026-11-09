@@ -5,6 +5,7 @@ import { C, usd, shortAddr } from "../../theme/theme";
 import { Screen, TopBar, T, Card, Button, Chip, ShieldResult, Notice, Pill } from "../../components/UI";
 import { useStore, DEMO } from "../../state/store";
 import { checkSend, NETWORKS } from "../../shield/shield";
+import { Asset, Float, Glow, haptic } from "../../components/Brand";
 
 // Decorative QR-style block, seeded from the address so it looks stable.
 function PseudoQR({ seed, size = 132 }) {
@@ -41,8 +42,9 @@ export default function FundVault({ navigation }) {
     return (
       <Screen footer={<Button label="Done" onPress={() => navigation.goBack()} />}>
         <View style={{ alignItems: "center", marginTop: 60 }}>
-          <View style={{ width: 84, height: 84, borderRadius: 28, backgroundColor: C.indigo, alignItems: "center", justifyContent: "center" }}>
-            <Ionicons name="lock-closed" size={38} color="#fff" />
+          <View style={{ width: 180, height: 160, alignItems: "center", justifyContent: "center" }}>
+            <Glow size={180} color={C.indigo} strength={0.06} />
+            <Float amplitude={6}><Asset name="padlock" size={140} /></Float>
           </View>
           <T w="heavy" size={24} style={{ marginTop: 18 }}>Vault funded</T>
           <T size={14} color={C.muted} style={{ marginTop: 6, textAlign: "center", lineHeight: 20 }}>
@@ -54,7 +56,7 @@ export default function FundVault({ navigation }) {
   }
 
   return (
-    <Screen footer={<Button label={`Pay ${usd(p.vaultTotal)} from my wallet`} icon="wallet" onPress={() => { actions.fundVault(); setFunded(true); }} disabled={result.level !== "safe"} />}>
+    <Screen footer={<Button label={`Pay ${usd(p.vaultTotal)} from my wallet`} icon="wallet" onPress={() => { actions.fundVault(); haptic.success(); setFunded(true); }} disabled={result.level !== "safe"} />}>
       <TopBar onBack={() => navigation.goBack()} title={`Fund ${kid}'s vault`} sub="Send USDT from your own wallet. Only the plan's rules can release it." />
 
       <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
@@ -63,8 +65,17 @@ export default function FundVault({ navigation }) {
         ))}
       </View>
 
-      <Card style={{ alignItems: "center", paddingVertical: 22 }}>
-        <T w="heavy" size={30}>{usd(p.vaultTotal)} <T w="bold" size={15} color={C.muted}>USDT</T></T>
+      <Card gradient="indigo" style={{ flexDirection: "row", alignItems: "center", overflow: "hidden", paddingVertical: 12 }}>
+        <View style={{ flex: 1 }}>
+          <T w="bold" size={12} color={C.gold} style={{ letterSpacing: 1 }}>{kid.toUpperCase()}'S VAULT</T>
+          <T w="heavy" size={30} color="#fff" style={{ letterSpacing: -0.6 }}>{usd(p.vaultTotal)} <T w="bold" size={15} color="#C9CCF5">USDT</T></T>
+          <T size={12.5} color="#DADCFF">Released only by the plan's rules</T>
+        </View>
+        <Float amplitude={5}><Asset name="vault" size={96} /></Float>
+      </Card>
+
+      <Card style={{ alignItems: "center", paddingVertical: 20 }}>
+        <T w="semi" size={13} color={C.muted}>Scan or copy to send from any USDT wallet</T>
         <View style={{ marginTop: 14, padding: 10, borderRadius: 14, borderWidth: 1, borderColor: C.line }}>
           <PseudoQR seed={vault} />
         </View>

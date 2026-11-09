@@ -68,7 +68,7 @@ export default function CreatePlan({ navigation }) {
           <Stepper value={weeks} onChange={setWeeks} max={MAX_WEEKS} suffix="weeks" />
           <View style={{ height: 14 }} />
           {plan.ok ? (
-            <Card tone="indigo" style={{ padding: 18 }}>
+            <Card gradient="indigo" style={{ padding: 18 }}>
               <T w="semi" size={13} color="#C9CCF5">{kid} gets</T>
               <T w="heavy" size={34} color="#fff" style={{ letterSpacing: -0.8 }}>{usd(plan.perPayout)}</T>
               <T w="semi" size={14} color="#fff">{cadence} · ≈ {naira(toNaira(plan.perPayout))}</T>

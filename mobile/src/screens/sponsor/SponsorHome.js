@@ -9,6 +9,8 @@ import { nextPayout } from "../../state/planMath";
 import { AskRow } from "../student/StudentAsks";
 import { ActivityRow } from "../student/Activity";
 import { MOODS } from "../student/CheckIn";
+import { Asset } from "../../components/Brand";
+import GettingStarted from "../../components/GettingStarted";
 
 export default function SponsorHome({ navigation }) {
   const { state } = useStore();
@@ -29,9 +31,39 @@ export default function SponsorHome({ navigation }) {
         <Pill text={state.sponsor.city} tone="muted" icon="location" />
       </View>
 
+
+      {!p || p.status === "awaiting_funding" || p.status === "invited" ? (
+        <Entrance delay={60}>
+          <GettingStarted
+            title={!p ? `Set up ${kid}'s plan` : p.status === "awaiting_funding" ? "Fund the vault" : `Waiting for ${kid}`}
+            sub={
+              !p
+                ? "About a minute. You choose the amount and length. We work out the weekly payday."
+                : p.status === "awaiting_funding"
+                ? `Send ${usd(p.vaultTotal)} USDT to ${kid}'s vault. Only the plan's rules can release it.`
+                : `${kid} is reviewing the plan. Paydays start the Monday after they accept.`
+            }
+            steps={[
+              [`Connected to ${kid}`, true],
+              ["Create the plan", !!p],
+              ["Fund the vault", p?.status === "invited"],
+              [`${kid} accepts`, false],
+              ["First payday on Monday", false],
+            ]}
+          >
+            {!p ? (
+              <Button label={`Create ${kid}'s plan`} variant="gold" icon="add-circle" onPress={() => navigation.navigate("CreatePlan")} style={{ marginTop: 18 }} />
+            ) : p.status === "awaiting_funding" ? (
+              <Button label="Fund the vault" variant="gold" icon="lock-closed" onPress={() => navigation.navigate("FundVault")} style={{ marginTop: 18 }} />
+            ) : null}
+
+          </GettingStarted>
+        </Entrance>
+      ) : null}
+
       <Entrance>
-        <Card tone="ink" onPress={() => navigation.navigate("ScamCheck")} style={{ flexDirection: "row", alignItems: "center", padding: 18 }}>
-          <IconChip icon="shield-checkmark" tone="onDark" size={46} style={{ marginRight: 14 }} />
+        <Card gradient="ink" onPress={() => navigation.navigate("ScamCheck")} style={{ flexDirection: "row", alignItems: "center", padding: 14 }}>
+          <Asset name="shield" size={58} style={{ marginRight: 12 }} />
           <View style={{ flex: 1 }}>
             <T w="heavy" size={16} color="#fff">Is this really {kid}?</T>
             <T size={12.5} color="#B9BDEB" style={{ marginTop: 2 }}>Got a call or WhatsApp asking for money? Check here first.</T>
@@ -53,14 +85,7 @@ export default function SponsorHome({ navigation }) {
             {p?.status === "active" ? <Pill text="Plan active" tone="safe" icon="checkmark" /> : null}
           </View>
 
-          {!p ? (
-            <>
-              <T size={13.5} color={C.muted} style={{ marginTop: 14 }}>No plan yet. Set one up in about a minute.</T>
-              <Button label={`Create ${kid}'s plan`} icon="add-circle" onPress={() => navigation.navigate("CreatePlan")} />
-            </>
-          ) : p.status === "awaiting_funding" ? (
-            <Button label="Fund the vault" icon="lock-closed" onPress={() => navigation.navigate("FundVault")} style={{ marginTop: 14 }} />
-          ) : p.status === "invited" ? (
+          {!p || p.status === "awaiting_funding" ? null : p.status === "invited" ? (
             <View style={{ marginTop: 14, flexDirection: "row", alignItems: "center" }}>
               <Ionicons name="time" size={18} color={C.indigo} style={{ marginRight: 8 }} />
               <T w="semi" size={13.5} style={{ flex: 1 }}>Vault funded. Waiting for {kid} to accept the plan.</T>

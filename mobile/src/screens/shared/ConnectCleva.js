@@ -4,6 +4,8 @@ import { C } from "../../theme/theme";
 import { Screen, TopBar, Card, T, Button, Chip, Field, ShieldResult, IconChip, Notice } from "../../components/UI";
 import { useStore, DEMO } from "../../state/store";
 import { checkSend, NETWORKS } from "../../shield/shield";
+import SetupSteps, { STUDENT_STEPS } from "../../components/SetupSteps";
+import { Asset, Float } from "../../components/Brand";
 
 const STEPS = [
   ["person-add", "Open Cleva and sign up with code UNIUYO", "Use the same phone number."],
@@ -28,9 +30,18 @@ export default function ConnectCleva({ navigation }) {
     <Screen footer={<Button label="Save my payday address" onPress={save} disabled={!ok} icon="checkmark-circle" />}>
       <TopBar
         onBack={() => navigation.goBack()}
+        top={<SetupSteps steps={STUDENT_STEPS} current={1} />}
         title="Connect your Cleva account"
-        sub="Your paydays land here. Cleva turns them into dollars you can keep, spend with a card, or change to naira."
       />
+      <Card gradient="indigo" style={{ flexDirection: "row", alignItems: "center", paddingVertical: 10, overflow: "hidden" }}>
+        <View style={{ flex: 1, paddingRight: 8 }}>
+          <T w="heavy" size={17} color="#fff">Your paydays land here</T>
+          <T size={13} color="#DADCFF" style={{ marginTop: 4, lineHeight: 19 }}>
+            Cleva turns them into dollars you can keep, spend with a card, or change to naira.
+          </T>
+        </View>
+        <Float amplitude={5}><Asset name="wallet" size={104} /></Float>
+      </Card>
 
       {STEPS.map(([icon, title, sub], i) => (
         <Card key={icon} style={{ flexDirection: "row", alignItems: "center" }}>

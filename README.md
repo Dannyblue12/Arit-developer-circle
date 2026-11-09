@@ -10,6 +10,7 @@ app. **Shield** checks every payment before money leaves.
 
 > USDT carries the rules. Cleva is the student's bank.
 
+![Onboarding](docs/wellsent-onboarding.png)
 ![Student screens](docs/wellsent-student-screens.png)
 ![Sponsor screens](docs/wellsent-sponsor-screens.png)
 
@@ -40,7 +41,14 @@ naira payouts.
 
 React Native (Expo SDK 51). Brand: indigo `#3538CD`, ink `#10153A`, payday gold
 `#F5B800` (money moments only), Plus Jakarta Sans. Green/orange/red are reserved
-for Shield verdicts.
+for Shield verdicts. Brand gradients (`GRAD` in `src/components/Brand.js`) paint
+onboarding, hero cards and primary buttons.
+
+3D objects live in `mobile/assets/3d/` (vault, padlock, coin, wallet, shield).
+The vault and padlock were recoloured from red to brand indigo, since red means
+danger in this app. Motion uses React Native's Animated API (floating objects,
+parallax onboarding, coin drop, Shield shake) and `expo-haptics`, and switches
+off when the phone's Reduce Motion setting is on.
 
 ```bash
 cd mobile
@@ -57,7 +65,9 @@ four weeks in, and `&screen=Name` opens a specific screen.
 
 ### Screens
 
-- **Shared:** Welcome · Sign up · Connect Cleva · Pair (invite code) · Shield check
+- **Shared:** Onboarding story (4 swipeable pages + role choice) · Sign up ·
+  Connect Cleva · Pair (invite code) · Shield check. Setup screens show
+  "Step X of Y"; both homes show a Getting Started checklist until the plan is live.
 - **Student:** Home (next payday, daily pace, progress) · Plan invite (5 promises) ·
   Payday landed · Asks · New ask · Emergency · Pull forward · School fees ·
   Weekly check-in · Activity · Me

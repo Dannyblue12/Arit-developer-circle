@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { C, usd, naira, toNaira } from "../../theme/theme";
 import { Screen, Card, T, Button, ListItem } from "../../components/UI";
 import { useStore, fmtDay } from "../../state/store";
+import { Gradient, Asset, Glow, haptic, useReducedMotion } from "../../components/Brand";
 
 export default function PaydayLanded({ navigation }) {
   const { state } = useStore();
@@ -12,19 +13,24 @@ export default function PaydayLanded({ navigation }) {
   const tx = state.activity.find((a) => a.type === "payday")?.tx || "";
   const coin = useRef(new Animated.Value(0)).current;
   const text = useRef(new Animated.Value(0)).current;
+  const reduced = useReducedMotion();
 
   useEffect(() => {
+    if (reduced) { coin.setValue(1); text.setValue(1); haptic.success(); return; }
     Animated.sequence([
-      Animated.spring(coin, { toValue: 1, friction: 5, tension: 70, useNativeDriver: true }),
+      Animated.spring(coin, { toValue: 1, friction: 4, tension: 60, useNativeDriver: true }),
       Animated.timing(text, { toValue: 1, duration: 280, useNativeDriver: true }),
     ]).start();
-  }, [coin, text]);
+    const t = setTimeout(haptic.success, 380); // buzz as the coin lands
+    return () => clearTimeout(t);
+  }, [coin, text, reduced]);
 
   if (!last) return null;
 
   return (
+    <Gradient preset="night" start={{ x: 0, y: 0 }} end={{ x: 0.5, y: 1 }} style={{ flex: 1 }}>
     <Screen
-      bg={C.ink}
+      bg="transparent"
       footer={
         <View>
           <Button label="Open Cleva" variant="gold" icon="open-outline" onPress={() => Linking.openURL("https://www.getcleva.com")} />
@@ -33,19 +39,25 @@ export default function PaydayLanded({ navigation }) {
       }
     >
       <StatusBar style="light" />
-      <View style={{ alignItems: "center", marginTop: 30 }}>
-        <Animated.View
-          style={{
-            width: 120, height: 120, borderRadius: 60, backgroundColor: C.gold, alignItems: "center", justifyContent: "center",
-            transform: [
-              { scale: coin.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }) },
-              { translateY: coin.interpolate({ inputRange: [0, 1], outputRange: [-60, 0] }) },
-            ],
-            opacity: coin,
-          }}
-        >
-          <Ionicons name="checkmark-sharp" size={70} color={C.ink} />
-        </Animated.View>
+      <View style={{ alignItems: "center", marginTop: 18 }}>
+        <View style={{ width: 220, height: 200, alignItems: "center", justifyContent: "center" }}>
+          <Glow size={230} color={C.gold} strength={0.07} />
+          <Animated.View
+            style={{
+              transform: [
+                { translateY: coin.interpolate({ inputRange: [0, 1], outputRange: [-220, 0] }) },
+                { rotate: coin.interpolate({ inputRange: [0, 1], outputRange: ["-200deg", "0deg"] }) },
+                { scale: coin.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] }) },
+              ],
+              opacity: coin.interpolate({ inputRange: [0, 0.2, 1], outputRange: [0, 1, 1] }),
+            }}
+          >
+            <Asset name="coin" size={170} />
+          </Animated.View>
+          <View style={{ position: "absolute", bottom: 4, right: 30, width: 40, height: 40, borderRadius: 20, backgroundColor: C.safe, alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: "#1A1D6E" }}>
+            <Ionicons name="checkmark-sharp" size={22} color="#fff" />
+          </View>
+        </View>
         <Animated.View style={{ alignItems: "center", opacity: text }}>
           <T w="heavy" size={28} color="#fff" style={{ marginTop: 24, textAlign: "center" }}>
             Your {usd(last.amount)} don land! 🎉
@@ -69,5 +81,6 @@ export default function PaydayLanded({ navigation }) {
         Proof on the blockchain: {tx.slice(0, 6)}…{tx.slice(-6)}
       </T>
     </Screen>
+    </Gradient>
   );
 }

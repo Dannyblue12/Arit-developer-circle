@@ -4,6 +4,7 @@ import { C, usd, naira, toNaira } from "../../theme/theme";
 import { Screen, TopBar, Card, T, Button, ListItem } from "../../components/UI";
 import Promises from "../../components/Promises";
 import { useStore } from "../../state/store";
+import { Asset, Float } from "../../components/Brand";
 
 export default function PlanInvite({ navigation }) {
   const { state, actions } = useStore();
@@ -31,13 +32,14 @@ export default function PlanInvite({ navigation }) {
     >
       <TopBar onBack={() => navigation.goBack()} title={`${sponsor} sent you a plan`} sub="Read it through. Nothing starts until you accept." />
 
-      <Card tone="indigo" style={{ padding: 20 }}>
+      <Card gradient="indigo" style={{ padding: 20, overflow: "hidden" }}>
+        <Float amplitude={6} style={{ position: "absolute", right: -10, bottom: -14 }}><Asset name="vault" size={120} /></Float>
         <T w="semi" size={13} color="#C9CCF5">Your payday</T>
         <T w="heavy" size={38} color="#fff" style={{ letterSpacing: -1 }}>{usd(p.perPayout)}</T>
         <T w="semi" size={14} color="#fff">
           every {p.everyWeeks === 1 ? "Monday" : "2 weeks"} for {p.weeks} weeks · ≈ {naira(toNaira(p.perPayout))}
         </T>
-        <T size={12.5} color="#C9CCF5" style={{ marginTop: 10 }}>Straight into your Cleva account.</T>
+        <T size={12.5} color="#C9CCF5" style={{ marginTop: 10, marginRight: 100 }}>Straight into your Cleva account.</T>
       </Card>
 
       <Card style={{ paddingVertical: 4 }}>

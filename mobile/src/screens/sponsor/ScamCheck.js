@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { C, usd } from "../../theme/theme";
 import { Screen, TopBar, T, Card, Button, Notice } from "../../components/UI";
 import { useStore } from "../../state/store";
+import { Asset, Float, Pulse } from "../../components/Brand";
 
 export default function ScamCheck({ navigation }) {
   const { state } = useStore();
@@ -23,8 +24,11 @@ export default function ScamCheck({ navigation }) {
       <TopBar onBack={() => navigation.goBack()} title={`Is this really ${kid}?`} sub="Someone asking for money on a new number, a call or WhatsApp? Check here first." />
 
       {open.length === 0 ? (
-        <Card tone="safe" style={{ alignItems: "center", paddingVertical: 30 }}>
-          <Ionicons name="shield-checkmark" size={64} color={C.safe} />
+        <Card tone="safe" style={{ alignItems: "center", paddingVertical: 24, overflow: "hidden" }}>
+          <View style={{ width: 180, height: 170, alignItems: "center", justifyContent: "center" }}>
+            <Pulse size={190} color={C.safe} />
+            <Float amplitude={6}><Asset name="shield" size={150} /></Float>
+          </View>
           <T w="heavy" size={24} color={C.safeInk} style={{ marginTop: 12, textAlign: "center" }}>{kid} has no open requests.</T>
           <T size={14} color={C.safeInk} style={{ marginTop: 8, textAlign: "center", lineHeight: 20 }}>
             Any message asking you for money outside Wellsent is not from {kid}'s account. Don't send.

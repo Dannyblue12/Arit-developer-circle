@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { C, usd } from "../../theme/theme";
 import { Screen, TopBar, T, Button, Notice, Card, Field, Pill } from "../../components/UI";
 import { useStore } from "../../state/store";
+import { Asset } from "../../components/Brand";
 
 const STEPS = [
   ["reserved", "Reserved in your vault"],
@@ -32,13 +33,13 @@ export default function Fees({ navigation }) {
       }
     >
       <TopBar onBack={() => navigation.goBack()} title="School fees" sub="Fees only go to the school's official channel. Never to a person." />
-      <Card tone="tint" style={{ flexDirection: "row", alignItems: "center" }}>
-        <Ionicons name="school" size={26} color={C.indigo} style={{ marginRight: 12 }} />
+      <Card gradient="indigo" style={{ flexDirection: "row", alignItems: "center", overflow: "hidden", paddingVertical: 12 }}>
         <View style={{ flex: 1 }}>
-          <T w="heavy" size={20}>{usd(p.fees)}</T>
-          <T size={12.5} color={C.muted}>for {p.feesSchool} · deadline {p.feesDeadline}</T>
+          <T w="bold" size={12} color={C.gold} style={{ letterSpacing: 1 }}>LOCKED FOR SCHOOL FEES</T>
+          <T w="heavy" size={30} color="#fff" style={{ letterSpacing: -0.6 }}>{usd(p.fees)}</T>
+          <T size={12.5} color="#DADCFF">{p.feesSchool} · deadline {p.feesDeadline}</T>
         </View>
-        <Pill text="Demo" tone="muted" />
+        <Asset name="padlock" size={88} />
       </Card>
 
       <Card>

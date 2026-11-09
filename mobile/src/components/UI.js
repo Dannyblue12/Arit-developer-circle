@@ -6,7 +6,9 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { C, F } from "../theme/theme";
+import { GRAD, haptic, useReducedMotion } from "./Brand";
 
 const WEIGHT = { regular: F.regular, medium: F.medium, semi: F.semi, bold: F.bold, heavy: F.heavy };
 
@@ -43,7 +45,7 @@ export function Screen({ children, scroll = true, bg = C.paper, pad = 20, footer
   );
 }
 
-export function TopBar({ title, onBack, right, sub }) {
+export function TopBar({ title, onBack, right, sub, top }) {
   return (
     <View style={{ marginBottom: 18 }}>
       <View style={st.topRow}>
@@ -55,6 +57,7 @@ export function TopBar({ title, onBack, right, sub }) {
         <View style={{ flex: 1 }} />
         {right}
       </View>
+      {top ? <View style={{ marginTop: 14 }}>{top}</View> : null}
       {title ? <T w="heavy" size={26} style={{ marginTop: 14, letterSpacing: -0.4 }}>{title}</T> : null}
       {sub ? <T size={14} color={C.muted} style={{ marginTop: 6, lineHeight: 21 }}>{sub}</T> : null}
     </View>
@@ -74,8 +77,15 @@ const CARD_TONES = {
   ink: { backgroundColor: C.ink, borderColor: C.ink },
 };
 
-export function Card({ children, style, onPress, tone = "default" }) {
-  const body = <View style={[st.card, CARD_TONES[tone], style]}>{children}</View>;
+// `gradient` (a GRAD preset name) paints the card with a brand gradient.
+export function Card({ children, style, onPress, tone = "default", gradient }) {
+  const body = gradient ? (
+    <LinearGradient colors={GRAD[gradient]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[st.card, { borderColor: "transparent" }, style]}>
+      {children}
+    </LinearGradient>
+  ) : (
+    <View style={[st.card, CARD_TONES[tone], style]}>{children}</View>
+  );
   return onPress ? <Pressable onPress={onPress} style={pressFx}>{body}</Pressable> : body;
 }
 
@@ -90,22 +100,34 @@ const BTN = {
 
 export function Button({ label, onPress, variant = "primary", icon, disabled, style, small }) {
   const v = BTN[variant];
+  const grad = variant === "primary" ? GRAD.button : variant === "gold" ? GRAD.gold : null;
+  const content = (
+    <>
+      {icon ? <Ionicons name={icon} size={small ? 16 : 18} color={v.fg} style={{ marginRight: 8 }} /> : null}
+      <T w="bold" size={small ? 13.5 : 15} color={v.fg}>{label}</T>
+    </>
+  );
   return (
     <Pressable
-      onPress={disabled ? undefined : onPress}
+      onPress={disabled ? undefined : () => { haptic.tap(); onPress && onPress(); }}
       accessibilityRole="button"
       accessibilityState={{ disabled: !!disabled }}
       style={({ pressed }) => [
-        st.btn,
-        small && st.btnSmall,
-        { backgroundColor: v.bg, borderColor: v.border },
+        st.btnWrap,
+        small && st.btnWrapSmall,
+        grad && !disabled && (variant === "gold" ? st.glowGold : st.glowIndigo),
         disabled && { opacity: 0.4 },
         style,
-        pressed && !disabled && { transform: [{ scale: 0.985 }], opacity: 0.92 },
+        pressed && !disabled && { transform: [{ scale: 0.985 }], opacity: 0.94 },
       ]}
     >
-      {icon ? <Ionicons name={icon} size={small ? 16 : 18} color={v.fg} style={{ marginRight: 8 }} /> : null}
-      <T w="bold" size={small ? 13.5 : 15} color={v.fg}>{label}</T>
+      {grad ? (
+        <LinearGradient colors={grad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[st.btn, small && st.btnSmall, { borderColor: "transparent" }]}>
+          {content}
+        </LinearGradient>
+      ) : (
+        <View style={[st.btn, small && st.btnSmall, { backgroundColor: v.bg, borderColor: v.border }]}>{content}</View>
+      )}
     </Pressable>
   );
 }
@@ -291,19 +313,29 @@ const SHIELD = {
 // The Shield verdict card. Danger pulses its border once to catch the eye.
 export function ShieldResult({ result, style }) {
   const pulse = useRef(new Animated.Value(0)).current;
+  const shake = useRef(new Animated.Value(0)).current;
+  const reduced = useReducedMotion();
   useEffect(() => {
+    if (result?.level === "caution") haptic.warning();
     if (result?.level !== "danger") return;
+    haptic.error();
     pulse.setValue(0);
     Animated.sequence([
       Animated.timing(pulse, { toValue: 1, duration: 300, useNativeDriver: false }),
       Animated.timing(pulse, { toValue: 0, duration: 500, useNativeDriver: false }),
     ]).start();
-  }, [result?.level, result?.reasons?.length, pulse]);
+    if (!reduced) {
+      shake.setValue(0);
+      Animated.sequence(
+        [10, -8, 6, -4, 0].map((x) => Animated.timing(shake, { toValue: x, duration: 60, useNativeDriver: false }))
+      ).start();
+    }
+  }, [result?.level, result?.reasons?.length, pulse, shake, reduced]);
   if (!result || result.level === "idle") return null;
   const s = SHIELD[result.level];
   const borderColor = pulse.interpolate({ inputRange: [0, 1], outputRange: [CARD_TONES[s.tone].borderColor, s.color] });
   return (
-    <Animated.View style={[st.card, CARD_TONES[s.tone], { borderWidth: 1.5, borderColor }, style]}>
+    <Animated.View style={[st.card, CARD_TONES[s.tone], { borderWidth: 1.5, borderColor, transform: [{ translateX: shake }] }, style]}>
       <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
         <Ionicons name={s.icon} size={20} color={s.color} style={{ marginRight: 8 }} />
         <T w="heavy" size={15} color={s.ink}>{s.head}</T>
@@ -330,11 +362,15 @@ export const st = StyleSheet.create({
     alignItems: "center", justifyContent: "center",
   },
   card: { borderRadius: 20, borderWidth: 1, padding: 16, marginBottom: 12 },
+  btnWrap: { borderRadius: 16, marginTop: 8 },
+  btnWrapSmall: { borderRadius: 12, marginTop: 0 },
   btn: {
     flexDirection: "row", alignItems: "center", justifyContent: "center",
-    borderRadius: 16, paddingVertical: 15, paddingHorizontal: 16, borderWidth: 1, marginTop: 8,
+    borderRadius: 16, paddingVertical: 15, paddingHorizontal: 16, borderWidth: 1,
   },
-  btnSmall: { paddingVertical: 10, borderRadius: 12, marginTop: 0 },
+  btnSmall: { paddingVertical: 10, borderRadius: 12 },
+  glowIndigo: { shadowColor: C.indigo, shadowOpacity: 0.28, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 4 },
+  glowGold: { shadowColor: "#C98A00", shadowOpacity: 0.3, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 4 },
   chip: {
     flexDirection: "row", alignItems: "center", paddingHorizontal: 13, paddingVertical: 9,
     borderRadius: 999, borderWidth: 1, borderColor: C.line, backgroundColor: "#fff", marginRight: 8, marginBottom: 8,
